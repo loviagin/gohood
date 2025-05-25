@@ -70,12 +70,12 @@ export default function Header() {
                             >
                                 Снять жилье
                             </Link>
-                            {/* <button 
+                            <button 
                                 onClick={handleSignOut}
                                 className={`${styles.authButton} ${styles.logoutButton}`}
                             >
                                 Выйти
-                            </button> */}
+                            </button>
                         </>
                     )}
                 </nav>

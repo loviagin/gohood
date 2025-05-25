@@ -45,6 +45,19 @@ export default function LandlordRegister() {
         }
     }, [session, currentStep]);
 
+    // Add session status logging
+    useEffect(() => {
+        console.log('Session status:', session ? 'Active' : 'No session');
+        if (session) {
+            console.log('Session data:', {
+                email: session.user?.email,
+                name: session.user?.name,
+                role: session.user?.role,
+                profileCompleted: session.user?.profileCompleted
+            });
+        }
+    }, [session]);
+
     const handleAuthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAuthData({
             ...authData,
@@ -85,12 +98,19 @@ export default function LandlordRegister() {
                         email: authData.email,
                         password: authData.password,
                         redirect: false,
+                        callbackUrl: '/become-landlord/register'
                     });
 
                     if (signInResult?.error) {
                         throw new Error('Неверный пароль для существующего пользователя');
                     }
 
+                    // Wait for session to be updated
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Force session update
+                    await updateSession();
+                    
                     // If sign in successful, move to profile step
                     setCurrentStep('details');
                     toast.success('Вход выполнен! Заполните профиль');
@@ -104,11 +124,18 @@ export default function LandlordRegister() {
                 email: authData.email,
                 password: authData.password,
                 redirect: false,
+                callbackUrl: '/become-landlord/register'
             });
 
             if (result?.error) {
                 throw new Error(result.error);
             }
+
+            // Wait for session to be updated
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Force session update
+            await updateSession();
 
             setCurrentStep('details');
             toast.success('Аккаунт создан! Заполните профиль');
@@ -124,12 +151,20 @@ export default function LandlordRegister() {
         e.preventDefault();
         setIsLoading(true);
 
+        // Ensure we have a valid session
+        if (!session?.user?.email) {
+            toast.error('Сессия истекла. Пожалуйста, войдите снова.');
+            setIsLoading(false);
+            return;
+        }
+
         try {
             const res = await fetch('/api/auth/update-profile', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // This ensures cookies (including session) are sent
                 body: JSON.stringify({
                     ...profileData,
                     role: 'landlord'
@@ -138,6 +173,13 @@ export default function LandlordRegister() {
 
             if (!res.ok) {
                 const error = await res.json();
+                if (res.status === 401) {
+                    // Session expired or invalid
+                    toast.error('Сессия истекла. Пожалуйста, войдите снова.');
+                    // Force a sign out and redirect to login
+                    await signIn('credentials', { redirect: false });
+                    return;
+                }
                 throw new Error(error.error || 'Profile update failed');
             }
 
@@ -147,7 +189,7 @@ export default function LandlordRegister() {
             await updateSession({
                 ...session,
                 user: {
-                    ...session?.user,
+                    ...session.user,
                     name: data.user.name,
                     email: data.user.email,
                     role: data.user.role,
@@ -167,10 +209,48 @@ export default function LandlordRegister() {
         }
     };
 
-    const handleSocialSignIn = (provider: string) => {
-        signIn(provider, { 
-            callbackUrl: '/become-landlord/register?step=details'
-        });
+    const handleSocialSignIn = async (provider: string) => {
+        try {
+            setIsLoading(true);
+            const result = await signIn(provider, { 
+                redirect: false,
+                callbackUrl: '/become-landlord/register'
+            });
+
+            if (result?.error) {
+                throw new Error('Ошибка при входе через ' + provider);
+            }
+
+            // Ждем обновления сессии
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Принудительно обновляем сессию
+            const updatedSession = await updateSession();
+            console.log('Сессия после входа через ' + provider + ':', updatedSession);
+
+            if (!updatedSession?.user?.email) {
+                throw new Error('Не удалось создать сессию. Попробуйте войти снова.');
+            }
+
+            // Если вход успешен, переходим к заполнению профиля
+            setCurrentStep('details');
+            toast.success('Вход выполнен! Заполните профиль');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Ошибка при входе через ' + provider);
+            console.error('Ошибка при входе через ' + provider + ':', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Обновляем обработчик клика по кнопке Яндекс
+    const handleYandexSignIn = () => {
+        handleSocialSignIn('yandex');
+    };
+
+    // Обновляем обработчик клика по кнопке Google
+    const handleGoogleSignIn = () => {
+        handleSocialSignIn('google');
     };
 
     if (currentStep === 'auth') {
@@ -232,19 +312,21 @@ export default function LandlordRegister() {
 
                     <div className={styles.socialButtons}>
                         <button
-                            onClick={() => handleSocialSignIn('google')}
+                            onClick={handleGoogleSignIn}
                             className={styles.googleButton}
+                            disabled={isLoading}
                         >
                             <FcGoogle className={styles.socialIcon} />
-                            Войти через Google
+                            {isLoading ? 'Вход...' : 'Войти через Google'}
                         </button>
 
                         <button
-                            onClick={() => handleSocialSignIn('yandex')}
+                            onClick={handleYandexSignIn}
                             className={styles.yandexButton}
+                            disabled={isLoading}
                         >
                             <FaYandex className={styles.socialIcon} />
-                            Войти через Яндекс
+                            {isLoading ? 'Вход...' : 'Войти через Яндекс'}
                         </button>
                     </div>
                 </div>

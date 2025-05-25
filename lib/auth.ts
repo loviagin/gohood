@@ -103,7 +103,17 @@ export const authOptions: AuthOptions = {
             clientSecret: process.env.YANDEX_CLIENT_SECRET!,
             authorization: {
                 params: {
-                    scope: "login:email login:info"
+                    scope: "login:email login:info login:avatar login:birthday"
+                }
+            },
+            async profile(profile) {
+                return {
+                    id: profile.id,
+                    name: profile.real_name || profile.display_name || profile.login,
+                    email: profile.default_email,
+                    image: profile.default_avatar_id ? `https://avatars.yandex.net/get-yapic/${profile.default_avatar_id}/islands-200` : null,
+                    role: 'landlord',
+                    profileCompleted: false
                 }
             }
         }),
