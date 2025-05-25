@@ -2,7 +2,7 @@ import { AuthOptions, Session, User as NextAuthUser, Account, Profile, DefaultSe
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import VkProvider from "next-auth/providers/vk";
+import YandexProvider from "next-auth/providers/yandex";
 import UserModel from "@/models/User";
 import bcrypt from "bcryptjs";
 
@@ -75,9 +75,9 @@ export const authOptions: AuthOptions = {
         }
     },
     providers: [
-        VkProvider({
-            clientId: process.env.VK_CLIENT_ID!,
-            clientSecret: process.env.VK_CLIENT_SECRET!
+        YandexProvider({
+            clientId: process.env.YANDEX_CLIENT_ID!,
+            clientSecret: process.env.YANDEX_CLIENT_SECRET!
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,

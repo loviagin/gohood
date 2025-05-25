@@ -148,7 +148,7 @@
 }
 
 .googleButton,
-.vkButton {
+.yandexButton {
   width: 100%;
   display: flex;
   align-items: center;
@@ -177,21 +177,23 @@
   background: #f1f5f9;
 }
 
-.vkButton {
-  background: #0077FF;
-  border: 1px solid #0077FF;
+.yandexButton {
+  background: #FC3F1D;
+  border: none;
   color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.vkButton:hover {
-  background: #0066DD;
-  border-color: #0066DD;
+.yandexButton:hover {
+  background: #E63A1A;
   transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.vkButton:active {
-  background: #0055CC;
+.yandexButton:active {
+  background: #D63518;
   transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .socialIcon {

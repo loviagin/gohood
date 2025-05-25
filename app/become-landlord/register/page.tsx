@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
-import { FaVk } from 'react-icons/fa';
+import { FaYandex } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
@@ -221,11 +221,11 @@ export default function LandlordRegister() {
                         </button>
 
                         <button
-                            onClick={() => handleSocialSignIn('vk')}
-                            className={styles.vkButton}
+                            onClick={() => handleSocialSignIn('yandex')}
+                            className={styles.yandexButton}
                         >
-                            <FaVk className={styles.socialIcon} />
-                            Войти через ВКонтакте
+                            <FaYandex className={styles.socialIcon} />
+                            Войти через Яндекс
                         </button>
                     </div>
                 </div>
