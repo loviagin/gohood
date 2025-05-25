@@ -18,8 +18,8 @@ export default function LandlordRegister() {
     );
     const [isLoading, setIsLoading] = useState(false);
     const [authData, setAuthData] = useState({
-        email: 'test@lovigin.com',
-        password: '1234567890',
+        email: '',
+        password: '',
     });
     const [profileData, setProfileData] = useState({
         name: '',
