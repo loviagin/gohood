@@ -77,7 +77,12 @@ export const authOptions: AuthOptions = {
     providers: [
         YandexProvider({
             clientId: process.env.YANDEX_CLIENT_ID!,
-            clientSecret: process.env.YANDEX_CLIENT_SECRET!
+            clientSecret: process.env.YANDEX_CLIENT_SECRET!,
+            authorization: {
+                params: {
+                    scope: "login:email login:info"
+                }
+            }
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
