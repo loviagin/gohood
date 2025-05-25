@@ -28,10 +28,12 @@ if (!global.mongoose) {
 
 async function connectDB() {
     if (cached.conn) {
+        console.log('Returning cached MongoDB connection');
         return cached.conn;
     }
 
     if (!cached.promise) {
+        console.log('Attempting to connect to MongoDB...');
         const opts = {
             bufferCommands: true,
             serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
@@ -46,7 +48,7 @@ async function connectDB() {
         };
 
         cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-            console.log('MongoDB connected successfully');
+            console.log(`MongoDB connected successfully to ${MONGODB_URI}`);
             return mongoose;
         });
     }
