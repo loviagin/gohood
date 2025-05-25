@@ -76,8 +76,27 @@ export default function LandlordRegister() {
                 }),
             });
 
+            const data = await res.json();
+
             if (!res.ok) {
-                throw new Error('Registration failed');
+                if (data.error === 'User already exists') {
+                    // Try to sign in the existing user
+                    const signInResult = await signIn('credentials', {
+                        email: authData.email,
+                        password: authData.password,
+                        redirect: false,
+                    });
+
+                    if (signInResult?.error) {
+                        throw new Error('Неверный пароль для существующего пользователя');
+                    }
+
+                    // If sign in successful, move to profile step
+                    setCurrentStep('details');
+                    toast.success('Вход выполнен! Заполните профиль');
+                    return;
+                }
+                throw new Error(data.error || 'Registration failed');
             }
 
             // Sign in the user after successful registration
@@ -94,7 +113,7 @@ export default function LandlordRegister() {
             setCurrentStep('details');
             toast.success('Аккаунт создан! Заполните профиль');
         } catch (error) {
-            toast.error('Ошибка при регистрации. Попробуйте снова.');
+            toast.error(error instanceof Error ? error.message : 'Ошибка при регистрации. Попробуйте снова.');
             console.error(error);
         } finally {
             setIsLoading(false);

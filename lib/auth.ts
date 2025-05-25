@@ -43,15 +43,38 @@ export const authOptions: AuthOptions = {
             return token;
         },
         async session({ session, token }: { session: Session; token: JWT }) {
-            if (token) {
-                // Получаем свежие данные пользователя из базы
-                const user = await UserModel.findOne({ email: session.user.email });
-                if (user) {
-                    session.user.id = user._id.toString();
-                    session.user.name = user.name;
-                    session.user.email = user.email;
-                    session.user.role = user.role;
-                    session.user.profileCompleted = user.profileCompleted;
+            if (token && session.user?.email) {
+                try {
+                    // Получаем свежие данные пользователя из базы
+                    const user = await UserModel.findOne({ email: session.user.email });
+                    if (user) {
+                        session.user.id = user._id.toString();
+                        session.user.name = user.name || '';
+                        session.user.email = user.email;
+                        session.user.role = user.role;
+                        session.user.profileCompleted = user.profileCompleted;
+                    } else {
+                        // If user not found in database, clear the session data
+                        session.user = {
+                            ...session.user,
+                            id: '',
+                            name: '',
+                            email: '',
+                            role: 'user',
+                            profileCompleted: false
+                        };
+                    }
+                } catch (error) {
+                    console.error('Error fetching user in session callback:', error);
+                    // On error, clear the session data
+                    session.user = {
+                        ...session.user,
+                        id: '',
+                        name: '',
+                        email: '',
+                        role: 'user',
+                        profileCompleted: false
+                    };
                 }
             }
             return session;
