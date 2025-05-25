@@ -2,13 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import User from '@/models/User';
-import mongoose from 'mongoose';
-
-// Подключаемся к MongoDB если еще не подключены
-const connectDB = async () => {
-    if (mongoose.connections[0].readyState) return;
-    await mongoose.connect(process.env.MONGODB_URI as string);
-};
+import connectDB from '@/lib/db';
 
 export async function POST(req: Request) {
     try {

@@ -1,19 +1,8 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import User from '@/models/User';
+import connectDB from '@/lib/db';
 import mongoose from 'mongoose';
-
-// Подключаемся к MongoDB если еще не подключены
-const connectDB = async () => {
-    if (mongoose.connections[0].readyState) return;
-    try {
-        await mongoose.connect(process.env.MONGODB_URI as string);
-        console.log('MongoDB connected successfully');
-    } catch (error) {
-        console.error('MongoDB connection error:', error);
-        throw error;
-    }
-};
 
 export async function POST(req: Request) {
     try {
