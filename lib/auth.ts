@@ -80,21 +80,36 @@ export const authOptions: AuthOptions = {
             return session;
         },
         async signIn({ user, account, profile }: { user: CustomUser; account: Account | null; profile?: Profile }) {
-            if (account?.provider === 'google' || account?.provider === 'vk') {
-                const existingUser = await UserModel.findOne({ email: user.email });
-                if (existingUser && profile?.sub) {
-                    // Обновляем данные пользователя из соцсети
-                    await UserModel.findOneAndUpdate(
-                        { email: user.email },
-                        {
+            try {
+                if (account?.provider === 'google' || account?.provider === 'yandex') {
+                    const existingUser = await UserModel.findOne({ email: user.email });
+                    
+                    if (existingUser) {
+                        // Обновляем данные пользователя из соцсети
+                        await UserModel.findOneAndUpdate(
+                            { email: user.email },
+                            {
+                                name: user.name,
+                                [`${account.provider}Id`]: profile?.sub,
+                                updatedAt: new Date()
+                            }
+                        );
+                    } else {
+                        // Создаем нового пользователя
+                        await UserModel.create({
+                            email: user.email,
                             name: user.name,
-                            [`${account.provider}Id`]: profile.sub,
-                            updatedAt: new Date()
-                        }
-                    );
+                            role: 'landlord',
+                            profileCompleted: false,
+                            [`${account.provider}Id`]: profile?.sub
+                        });
+                    }
                 }
+                return true;
+            } catch (error) {
+                console.error('Error in signIn callback:', error);
+                return false;
             }
-            return true;
         }
     },
     providers: [
@@ -103,17 +118,7 @@ export const authOptions: AuthOptions = {
             clientSecret: process.env.YANDEX_CLIENT_SECRET!,
             authorization: {
                 params: {
-                    scope: "login:email login:info login:avatar login:birthday"
-                }
-            },
-            async profile(profile) {
-                return {
-                    id: profile.id,
-                    name: profile.real_name || profile.display_name || profile.login,
-                    email: profile.default_email,
-                    image: profile.default_avatar_id ? `https://avatars.yandex.net/get-yapic/${profile.default_avatar_id}/islands-200` : null,
-                    role: 'landlord',
-                    profileCompleted: false
+                    scope: "login:email login:info"
                 }
             }
         }),

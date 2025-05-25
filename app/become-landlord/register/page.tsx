@@ -209,48 +209,10 @@ export default function LandlordRegister() {
         }
     };
 
-    const handleSocialSignIn = async (provider: string) => {
-        try {
-            setIsLoading(true);
-            const result = await signIn(provider, { 
-                redirect: false,
-                callbackUrl: '/become-landlord/register'
-            });
-
-            if (result?.error) {
-                throw new Error('Ошибка при входе через ' + provider);
-            }
-
-            // Ждем обновления сессии
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Принудительно обновляем сессию
-            const updatedSession = await updateSession();
-            console.log('Сессия после входа через ' + provider + ':', updatedSession);
-
-            if (!updatedSession?.user?.email) {
-                throw new Error('Не удалось создать сессию. Попробуйте войти снова.');
-            }
-
-            // Если вход успешен, переходим к заполнению профиля
-            setCurrentStep('details');
-            toast.success('Вход выполнен! Заполните профиль');
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Ошибка при входе через ' + provider);
-            console.error('Ошибка при входе через ' + provider + ':', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // Обновляем обработчик клика по кнопке Яндекс
-    const handleYandexSignIn = () => {
-        handleSocialSignIn('yandex');
-    };
-
-    // Обновляем обработчик клика по кнопке Google
-    const handleGoogleSignIn = () => {
-        handleSocialSignIn('google');
+    const handleSocialSignIn = (provider: string) => {
+        signIn(provider, { 
+            callbackUrl: '/become-landlord/register?step=details'
+        });
     };
 
     if (currentStep === 'auth') {
@@ -312,21 +274,19 @@ export default function LandlordRegister() {
 
                     <div className={styles.socialButtons}>
                         <button
-                            onClick={handleGoogleSignIn}
+                            onClick={() => handleSocialSignIn('google')}
                             className={styles.googleButton}
-                            disabled={isLoading}
                         >
                             <FcGoogle className={styles.socialIcon} />
-                            {isLoading ? 'Вход...' : 'Войти через Google'}
+                            Войти через Google
                         </button>
 
                         <button
-                            onClick={handleYandexSignIn}
+                            onClick={() => handleSocialSignIn('yandex')}
                             className={styles.yandexButton}
-                            disabled={isLoading}
                         >
                             <FaYandex className={styles.socialIcon} />
-                            {isLoading ? 'Вход...' : 'Войти через Яндекс'}
+                            Войти через Яндекс
                         </button>
                     </div>
                 </div>
