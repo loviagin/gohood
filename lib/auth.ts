@@ -3,6 +3,7 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import YandexProvider from "next-auth/providers/yandex";
+import VkProvider from "next-auth/providers/vk";
 import UserModel from "@/models/User";
 import bcrypt from "bcryptjs";
 
@@ -92,17 +93,20 @@ export const authOptions: AuthOptions = {
                                 name: user.name,
                                 [`${account.provider}Id`]: profile?.sub,
                                 updatedAt: new Date()
-                            }
+                            },
+                            { runValidators: false } // Отключаем валидацию при обновлении
                         );
                     } else {
                         // Создаем нового пользователя
-                        await UserModel.create({
+                        const newUser = {
                             email: user.email,
                             name: user.name,
                             role: 'landlord',
                             profileCompleted: false,
                             [`${account.provider}Id`]: profile?.sub
-                        });
+                        };
+                        
+                        await UserModel.create(newUser);
                     }
                 }
                 return true;
@@ -121,6 +125,10 @@ export const authOptions: AuthOptions = {
                     scope: "login:email login:info"
                 }
             }
+        }),
+        VkProvider({
+            clientId: process.env.VK_CLIENT_ID!,
+            clientSecret: process.env.VK_CLIENT_SECRET!
         }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,

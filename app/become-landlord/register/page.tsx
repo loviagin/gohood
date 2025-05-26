@@ -5,6 +5,7 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
 import { FaYandex } from 'react-icons/fa';
+import { FaVk } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
@@ -287,6 +288,14 @@ export default function LandlordRegister() {
                         >
                             <FaYandex className={styles.socialIcon} />
                             Войти через Яндекс
+                        </button>
+
+                        <button
+                            onClick={() => handleSocialSignIn('vk')}
+                            className={styles.vkButton}
+                        >
+                            <FaVk className={styles.socialIcon} />
+                            Войти через ВКонтакте
                         </button>
                     </div>
                 </div>

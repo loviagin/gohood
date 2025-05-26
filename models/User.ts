@@ -12,7 +12,7 @@ export interface IUser extends Document {
   companyName?: string;
   profileCompleted: boolean;
   googleId?: string;
-  vkId?: string;
+  yandexId?: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -21,8 +21,8 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: false },
     passwordHash: {
       type: String,
-      required: function() {
-        return !this.googleId && !this.vkId; // Required only for email/password auth
+      required: function(this: IUser) {
+        return !this.googleId && !this.yandexId;
       }
     },
     role: { type: String, enum: ['user', 'admin', 'owner', 'landlord'], default: 'user' },
@@ -31,7 +31,7 @@ const UserSchema = new Schema<IUser>(
     companyName: String,
     profileCompleted: { type: Boolean, default: false },
     googleId: String,
-    vkId: String
+    yandexId: String
   },
   { timestamps: true }
 );
