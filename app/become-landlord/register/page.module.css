@@ -141,11 +141,11 @@
   margin-left: 1rem;
 }
 
-.socialButtons {
+/* .socialButtons {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-}
+} */
 
 .googleButton,
 .yandexButton,
