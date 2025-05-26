@@ -82,31 +82,41 @@ export const authOptions: AuthOptions = {
         },
         async signIn({ user, account, profile }: { user: CustomUser; account: Account | null; profile?: Profile }) {
             try {
-                if (account?.provider === 'google' || account?.provider === 'yandex') {
+                if (account?.provider === 'google' || account?.provider === 'yandex' || account?.provider === 'vk') {
                     const existingUser = await UserModel.findOne({ email: user.email });
                     
                     if (existingUser) {
-                        // Обновляем данные пользователя из соцсети
+                        // Update existing user's social ID and name
+                        const updateData: any = {
+                            name: user.name,
+                            updatedAt: new Date()
+                        };
+                        
+                        // Set the appropriate social ID based on provider
+                        if (account.provider === 'google') updateData.googleId = profile?.sub;
+                        if (account.provider === 'yandex') updateData.yandexId = profile?.sub;
+                        if (account.provider === 'vk') updateData.vkId = profile?.sub;
+                        
                         await UserModel.findOneAndUpdate(
                             { email: user.email },
-                            {
-                                name: user.name,
-                                [`${account.provider}Id`]: profile?.sub,
-                                updatedAt: new Date()
-                            },
-                            { runValidators: false } // Отключаем валидацию при обновлении
+                            updateData,
+                            { runValidators: false }
                         );
                     } else {
-                        // Создаем нового пользователя
-                        const newUser = {
+                        // Create new user without passwordHash for social login
+                        const newUserData: any = {
                             email: user.email,
                             name: user.name,
                             role: 'landlord',
-                            profileCompleted: false,
-                            [`${account.provider}Id`]: profile?.sub
+                            profileCompleted: false
                         };
                         
-                        await UserModel.create(newUser);
+                        // Set the appropriate social ID based on provider
+                        if (account.provider === 'google') newUserData.googleId = profile?.sub;
+                        if (account.provider === 'yandex') newUserData.yandexId = profile?.sub;
+                        if (account.provider === 'vk') newUserData.vkId = profile?.sub;
+                        
+                        await UserModel.create(newUserData);
                     }
                 }
                 return true;

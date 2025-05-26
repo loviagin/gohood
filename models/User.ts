@@ -13,6 +13,7 @@ export interface IUser extends Document {
   profileCompleted: boolean;
   googleId?: string;
   yandexId?: string;
+  vkId?: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -22,7 +23,16 @@ const UserSchema = new Schema<IUser>(
     passwordHash: {
       type: String,
       required: function(this: IUser) {
-        return !this.googleId && !this.yandexId;
+        return !this.googleId && !this.yandexId && !this.vkId;
+      },
+      validate: {
+        validator: function(this: IUser, value: string) {
+          if (this.googleId || this.yandexId || this.vkId) {
+            return value === undefined;
+          }
+          return value !== undefined;
+        },
+        message: 'Password is required for non-social login users'
       }
     },
     role: { type: String, enum: ['user', 'admin', 'owner', 'landlord'], default: 'user' },
@@ -31,7 +41,8 @@ const UserSchema = new Schema<IUser>(
     companyName: String,
     profileCompleted: { type: Boolean, default: false },
     googleId: String,
-    yandexId: String
+    yandexId: String,
+    vkId: String
   },
   { timestamps: true }
 );
