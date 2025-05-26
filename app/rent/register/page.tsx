@@ -86,7 +86,7 @@ export default function LandlordRegister() {
                 body: JSON.stringify({
                     email: authData.email,
                     password: authData.password,
-                    role: 'landlord'
+                    role: 'owner'
                 }),
             });
 
@@ -99,7 +99,7 @@ export default function LandlordRegister() {
                         email: authData.email,
                         password: authData.password,
                         redirect: false,
-                        callbackUrl: '/become-landlord/register'
+                        callbackUrl: '/rent/register'
                     });
 
                     if (signInResult?.error) {
@@ -212,7 +212,7 @@ export default function LandlordRegister() {
 
     const handleSocialSignIn = (provider: string) => {
         signIn(provider, { 
-            callbackUrl: '/become-landlord/register?step=details'
+            callbackUrl: '/rent/register?step=details'
         });
     };
 
@@ -221,9 +221,9 @@ export default function LandlordRegister() {
             <div className={styles.container}>
                 <div className={styles.content}>
                     <div className={styles.header}>
-                        <h1 className={styles.title}>Регистрация арендодателя</h1>
+                        <h1 className={styles.title}>Зарегистрируйтесь для аренды жилья</h1>
                         <p className={styles.subtitle}>
-                            Создайте аккаунт, чтобы начать размещать свои объекты
+                            Создайте аккаунт, чтобы начать снимать жилье
                         </p>
                     </div>
 

@@ -238,10 +238,14 @@
   margin-right: auto;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .hero {
-    padding: 1.5rem;
-    min-height: 90vh;
+    min-height: 80vh;
+    padding: 4rem 1.5rem;
+  }
+
+  .heroContent {
+    max-width: 600px;
   }
 
   .benefits, .cta {
@@ -249,8 +253,49 @@
   }
 
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
+  }
+
+  .card {
+    padding: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 3rem 1.25rem;
+    min-height: 70vh;
+  }
+
+  .heroContent {
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    margin-bottom: 2rem;
+  }
+
+  .ctaButton {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .benefits, .cta {
+    padding: 3rem 1.25rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 2.5rem;
   }
 
   .card {
@@ -258,17 +303,87 @@
   }
 
   .icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     margin-bottom: 1rem;
   }
 
   .cardTitle {
     font-size: 1.25rem;
+    margin-bottom: 0.75rem;
   }
 
   .description {
     font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .sectionTitle, .ctaTitle {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    margin-bottom: 0.75rem;
+  }
+
+  .ctaSubtitle {
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 2rem 1rem;
+    min-height: 60vh;
+  }
+
+  .title {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ctaButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .benefits, .cta {
+    padding: 2.5rem 1rem;
+  }
+
+  .grid {
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  .icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 0.75rem;
+  }
+
+  .cardTitle {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .description {
+    font-size: 0.875rem;
+  }
+
+  .sectionTitle, .ctaTitle {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+  }
+
+  .ctaSubtitle {
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
   }
 }
 

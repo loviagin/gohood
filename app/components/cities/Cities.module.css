@@ -136,20 +136,62 @@
 
 @media (max-width: 768px) {
   .cities {
-    padding: 4rem 1.5rem;
+    padding: 3rem 1rem;
+  }
+
+  .title {
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    margin-bottom: 0.75rem;
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    margin-bottom: 2.5rem;
+    padding: 0 0.5rem;
   }
 
   .grid {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
+    gap: 1.25rem;
+    padding: 0 0.5rem;
+  }
+
+  .card {
+    border-radius: 1.25rem;
+    aspect-ratio: 16/10;
   }
 
   .overlay {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 
   .name {
     font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cities {
+    padding: 2.5rem 0.75rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0;
+  }
+
+  .card {
+    border-radius: 1rem;
+    aspect-ratio: 16/9;
+  }
+
+  .overlay {
+    padding: 1rem;
+  }
+
+  .name {
+    font-size: 1.125rem;
   }
 }
 
