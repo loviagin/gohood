@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
-import { FaYandex } from 'react-icons/fa';
-import { FaVk } from 'react-icons/fa';
+// import { FaYandex } from 'react-icons/fa';
+// import { FaVk } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
@@ -282,7 +282,7 @@ export default function LandlordRegister() {
                             Войти через Google
                         </button>
 
-                        <button
+                        {/* <button
                             onClick={() => handleSocialSignIn('yandex')}
                             className={styles.yandexButton}
                         >
@@ -296,7 +296,7 @@ export default function LandlordRegister() {
                         >
                             <FaVk className={styles.socialIcon} />
                             Войти через ВКонтакте
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>
