@@ -8,6 +8,7 @@ import { FcGoogle } from 'react-icons/fc';
 // import { FaVk } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
+import InputMask from 'react-input-mask';
 
 type RegistrationStep = 'auth' | 'details';
 
@@ -67,10 +68,58 @@ export default function LandlordRegister() {
     };
 
     const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setProfileData({
-            ...profileData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+        
+        if (name === 'phone') {
+            // Оставляем только цифры и первый плюс
+            let numbers = value.replace(/[^\d+]/g, '');
+            
+            // Убираем все плюсы кроме первого
+            if (numbers.includes('+')) {
+                numbers = '+' + numbers.replace(/\+/g, '');
+            } else {
+                numbers = '+' + numbers;
+            }
+            
+            // Форматируем номер
+            let result = '';
+            const digits = numbers.slice(1); // убираем плюс для форматирования
+            
+            if (digits.length > 0) {
+                result = '+' + digits[0]; // код страны
+                
+                if (digits.length > 1) {
+                    result += ' (' + digits.slice(1, 4);
+                    
+                    if (digits.length > 4) {
+                        result += ') ' + digits.slice(4, 7);
+                        
+                        if (digits.length > 7) {
+                            result += '-' + digits.slice(7, 9);
+                            
+                            if (digits.length > 9) {
+                                result += '-' + digits.slice(9, 11);
+                            }
+                        }
+                    } else {
+                        result += ')';
+                    }
+                }
+            }
+            
+            console.log('Input value:', value);
+            console.log('Formatted number:', result);
+            
+            setProfileData(prev => ({
+                ...prev,
+                [name]: result
+            }));
+        } else {
+            setProfileData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -345,11 +394,23 @@ export default function LandlordRegister() {
                             id="phone"
                             name="phone"
                             type="tel"
-                            required
                             value={profileData.phone}
                             onChange={handleProfileChange}
+                            onKeyDown={(e) => {
+                                // Разрешаем только цифры, плюс, бэкспейс и удаление
+                                if (!/[\d+]/.test(e.key) && 
+                                    e.key !== 'Backspace' && 
+                                    e.key !== 'Delete' && 
+                                    e.key !== 'ArrowLeft' && 
+                                    e.key !== 'ArrowRight' &&
+                                    e.key !== 'Tab') {
+                                    e.preventDefault();
+                                }
+                            }}
                             className={styles.input}
-                            placeholder="+7 (___) ___-__-__"
+                            placeholder="+X (XXX) XXX-XX-XX"
+                            maxLength={20}
+                            required
                         />
                     </div>
 

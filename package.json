@@ -12,6 +12,7 @@
     "@auth/mongodb-adapter": "^3.9.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/mongoose": "^5.11.96",
+    "@types/react-input-mask": "^3.0.6",
     "bcryptjs": "^3.0.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.511.0",
@@ -24,6 +25,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
+    "react-input-mask": "^2.0.4",
     "react-intersection-observer": "^9.16.0"
   },
   "devDependencies": {
