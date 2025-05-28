@@ -1,19 +1,422 @@
 "use client"
-import { Wifi, MapPin, Train, Coffee, ShoppingBag, Sparkles, Map, Search } from "lucide-react";
-import { useState, FormEvent } from "react";
+import { Wifi, MapPin, Sparkles, Map, Search, Home, Building2, House, Building, Users, Calendar as CalendarIcon } from "lucide-react";
+import { useState, FormEvent, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import styles from "./Hero.module.css";
+import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, subDays } from "date-fns";
+import { ru } from "date-fns/locale";
 
 type SearchTab = "housing" | "districts";
+type HousingType = "apartment" | "house" | "studio" | "townhouse";
+
+interface SearchParams {
+  location: string;
+  checkIn: Date;
+  checkOut: Date | null;
+  guests: number;
+  housingTypes: HousingType[];
+}
+
+type DateSelection = { type: 'start' | 'end', date: Date };
+
+const DatePickerCalendar = ({ 
+  selectedDates, 
+  onDateSelect, 
+  onClose 
+}: { 
+  selectedDates: { start: Date; end: Date | null }; 
+  onDateSelect: (selection: DateSelection) => void; 
+  onClose: () => void;
+}) => {
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(selectedDates.start));
+  const [isSelectingEnd, setIsSelectingEnd] = useState(false);
+  
+  // Сбрасываем состояние при открытии календаря
+  useEffect(() => {
+    setIsSelectingEnd(false);
+  }, []);
+
+  const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const days = eachDayOfInterval({ 
+    start: startOfMonth(currentMonth), 
+    end: endOfMonth(currentMonth) 
+  });
+
+  // Добавляем дни предыдущего месяца для заполнения первой недели
+  const firstDayOfMonth = startOfMonth(currentMonth);
+  const firstDayOfWeek = firstDayOfMonth.getDay() || 7;
+  const prevMonthDays = Array.from({ length: firstDayOfWeek - 1 }, (_, i) => 
+    subDays(firstDayOfMonth, firstDayOfWeek - 1 - i)
+  );
+
+  // Добавляем дни следующего месяца для заполнения последней недели
+  const lastDayOfMonth = endOfMonth(currentMonth);
+  const lastDayOfWeek = lastDayOfMonth.getDay() || 7;
+  const nextMonthDays = Array.from({ length: 7 - lastDayOfWeek }, (_, i) => 
+    addDays(lastDayOfMonth, i + 1)
+  );
+
+  const allDays = [...prevMonthDays, ...days, ...nextMonthDays];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isDateDisabled = (date: Date) => {
+    return date < today;
+  };
+
+  const handlePrevMonth = () => {
+    const newMonth = subMonths(currentMonth, 1);
+    if (newMonth >= startOfMonth(today)) {
+      setCurrentMonth(newMonth);
+    }
+  };
+
+  const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
+
+  const isDateSelected = (date: Date) => {
+    return isSameDay(date, selectedDates.start) || (selectedDates.end && isSameDay(date, selectedDates.end));
+  };
+
+  const isDateInRange = (date: Date) => {
+    if (!selectedDates.start || !selectedDates.end) return false;
+    return date > selectedDates.start && date < selectedDates.end;
+  };
+
+  const handleDateClick = (date: Date) => {
+    if (isDateDisabled(date)) return;
+    
+    if (!isSelectingEnd) {
+      // Если мы не в режиме выбора конечной даты, значит выбираем начальную
+      onDateSelect({ type: 'start', date });
+      setIsSelectingEnd(true);
+    } else {
+      // Если мы в режиме выбора конечной даты
+      if (date < selectedDates.start) {
+        // Если выбранная дата раньше начальной, делаем её новой начальной
+        onDateSelect({ type: 'start', date });
+        setIsSelectingEnd(true);
+      } else {
+        // Иначе устанавливаем как конечную и закрываем пикер
+        onDateSelect({ type: 'end', date });
+        onClose();
+      }
+    }
+  };
+
+  return (
+    <div className={styles.calendar}>
+      <div className={styles.calendarHeader}>
+        <button 
+          type="button" 
+          className={styles.calendarNavButton}
+          onClick={handlePrevMonth}
+          disabled={currentMonth <= startOfMonth(today)}
+          aria-label="Предыдущий месяц"
+        >
+          ←
+        </button>
+        <span className={styles.calendarMonth}>
+          {format(currentMonth, 'LLLL yyyy', { locale: ru })}
+        </span>
+        <button 
+          type="button" 
+          className={styles.calendarNavButton}
+          onClick={handleNextMonth}
+          aria-label="Следующий месяц"
+        >
+          →
+        </button>
+      </div>
+      <div className={styles.calendarGrid}>
+        {weekdays.map(day => (
+          <div key={day} className={styles.calendarWeekday}>
+            {day}
+          </div>
+        ))}
+        {allDays.map((day, dayIdx) => {
+          const isSelected = isDateSelected(day);
+          const isInRange = isDateInRange(day);
+          const isDisabled = !isSameMonth(day, currentMonth) || isDateDisabled(day);
+          const isCurrentDay = isToday(day);
+          const isStart = isSameDay(day, selectedDates.start);
+          const isEnd = selectedDates.end && isSameDay(day, selectedDates.end);
+
+          return (
+            <button
+              key={day.toString()}
+              type="button"
+              className={`
+                ${styles.calendarDay}
+                ${isSelected ? styles.calendarDaySelected : ''}
+                ${isInRange ? styles.calendarDayRange : ''}
+                ${isDisabled ? styles.calendarDayDisabled : ''}
+                ${isCurrentDay ? styles.calendarDayToday : ''}
+                ${isStart ? styles.calendarDayRangeStart : ''}
+                ${isEnd ? styles.calendarDayRangeEnd : ''}
+              `}
+              onClick={() => !isDisabled && handleDateClick(day)}
+              disabled={isDisabled}
+              aria-label={format(day, 'd MMMM yyyy', { locale: ru })}
+              aria-selected={isSelected || undefined}
+            >
+              {format(day, 'd')}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const DatePickerPortal = ({ 
+  isOpen, 
+  onClose, 
+  selectedDates, 
+  onDateSelect,
+  buttonRef
+}: { 
+  isOpen: boolean;
+  onClose: () => void;
+  selectedDates: { start: Date; end: Date | null };
+  onDateSelect: (selection: DateSelection) => void;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
+}) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (!isOpen || !buttonRef.current) return;
+
+    const updatePosition = () => {
+      const buttonRect = buttonRef.current?.getBoundingClientRect();
+      if (!buttonRect) return;
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+      setPosition({
+        top: buttonRect.bottom + scrollTop + 8,
+        left: buttonRect.left + scrollLeft
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isOpen, buttonRef]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const isMobile = window.innerWidth <= 768;
+
+  const portalContent = (
+    <>
+      <div 
+        className={styles.datePickerOverlay}
+        onClick={onClose}
+      />
+      <div 
+        ref={dropdownRef}
+        className={styles.datePickerDropdown}
+        style={!isMobile ? {
+          top: `${position.top}px`,
+          left: `${position.left}px`,
+        } : undefined}
+      >
+        <DatePickerCalendar
+          selectedDates={selectedDates}
+          onDateSelect={onDateSelect}
+          onClose={onClose}
+        />
+      </div>
+    </>
+  );
+
+  return createPortal(portalContent, document.body);
+};
+
+const GuestPickerPortal = ({ 
+  isOpen, 
+  onClose, 
+  guests,
+  onGuestChange,
+  buttonRef
+}: { 
+  isOpen: boolean;
+  onClose: () => void;
+  guests: number;
+  onGuestChange: (change: number) => void;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
+}) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        buttonRef.current?.contains(event.target as Node) ||
+        dropdownRef.current?.contains(event.target as Node)
+      ) {
+        return;
+      }
+      onClose();
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose, buttonRef]);
+
+  if (!isOpen) return null;
+
+  const isMobile = window.innerWidth <= 768;
+
+  const portalContent = (
+    <>
+      {isMobile && (
+        <div 
+          className={styles.datePickerOverlay}
+          onClick={onClose}
+        />
+      )}
+      <div 
+        ref={dropdownRef}
+        className={styles.guestPickerDropdown}
+      >
+        <div className={styles.guestPickerControls}>
+          <button
+            type="button"
+            className={styles.guestPickerControl}
+            onClick={() => onGuestChange(-1)}
+            disabled={guests <= 1}
+          >
+            -
+          </button>
+          <span className={styles.guestPickerCount}>
+            {guests}
+          </span>
+          <button
+            type="button"
+            className={styles.guestPickerControl}
+            onClick={() => onGuestChange(1)}
+            disabled={guests >= 10}
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
+  // На мобильных устройствах рендерим портал в body
+  if (isMobile) {
+    return createPortal(portalContent, document.body);
+  }
+
+  // На десктопе рендерим портал внутри guestPickerWrapper
+  return createPortal(portalContent, buttonRef.current?.parentElement || document.body);
+};
 
 export default function Hero() {
   const [activeTab, setActiveTab] = useState<SearchTab>("housing");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useState<SearchParams>({
+    location: "",
+    checkIn: new Date(),
+    checkOut: null,
+    guests: 1,
+    housingTypes: [],
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [isGuestPickerOpen, setIsGuestPickerOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const guestPickerButtonRef = useRef<HTMLButtonElement>(null);
+
+  const housingTypes: { type: HousingType; label: string; icon: typeof Home }[] = [
+    { type: "apartment", label: "Квартира", icon: Building2 },
+    { type: "house", label: "Дом", icon: House },
+    { type: "studio", label: "Студия", icon: Home },
+    { type: "townhouse", label: "Таунхаус", icon: Building },
+  ];
+
+  const handleHousingTypeClick = (type: HousingType) => {
+    setSearchParams(prev => ({
+      ...prev,
+      housingTypes: prev.housingTypes.includes(type)
+        ? prev.housingTypes.filter(t => t !== type)
+        : [...prev.housingTypes, type]
+    }));
+  };
+
+  const handleGuestChange = (change: number) => {
+    setSearchParams(prev => ({
+      ...prev,
+      guests: Math.max(1, Math.min(10, prev.guests + change))
+    }));
+  };
+
+  const handleDateChange = (selection: DateSelection) => {
+    setSearchParams(prev => {
+      if (selection.type === 'start') {
+        return {
+          ...prev,
+          checkIn: selection.date,
+          checkOut: null
+        };
+      } else {
+        return {
+          ...prev,
+          checkOut: selection.date
+        };
+      }
+    });
+  };
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) {
+    if (!searchParams.location.trim()) {
       setError("Пожалуйста, введите город или район");
       return;
     }
@@ -24,7 +427,7 @@ export default function Hero() {
     try {
       // TODO: Implement actual search logic
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
-      console.log(`Searching for ${searchQuery} in ${activeTab} mode`);
+      console.log('Search params:', searchParams);
     } catch (err) {
       setError("Произошла ошибка при поиске. Пожалуйста, попробуйте снова.");
     } finally {
@@ -34,9 +437,20 @@ export default function Hero() {
 
   const handleTabChange = (tab: SearchTab) => {
     setActiveTab(tab);
-    setSearchQuery("");
+    setSearchParams(prev => ({ ...prev, location: "" }));
     setError(null);
   };
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <section className={styles.hero} aria-label="Поиск жилья">
@@ -91,85 +505,126 @@ export default function Hero() {
             role="search"
             aria-label={`Поиск ${activeTab === "housing" ? "жилья" : "районов"}`}
           >
-            <div className={styles.searchInputWrapper}>
-              <MapPin className={styles.searchInputIcon} aria-hidden="true" />
-              <input
-                type="text"
-                placeholder={`Введите ${activeTab === "housing" ? "город или район" : "название района"}`}
-                className={`${styles.searchInput} ${error ? styles.searchInputError : ""}`}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setError(null);
-                }}
-                aria-invalid={!!error}
-                aria-describedby={error ? "search-error" : undefined}
+            <div className={styles.searchInputsGrid}>
+              <div className={styles.searchInputWrapper}>
+                <MapPin className={styles.searchInputIcon} aria-hidden="true" />
+                <input
+                  type="text"
+                  placeholder={`Введите ${activeTab === "housing" ? "город или район" : "название района"}`}
+                  className={`${styles.searchInput} ${error ? styles.searchInputError : ""}`}
+                  value={searchParams.location}
+                  onChange={(e) => {
+                    setSearchParams(prev => ({ ...prev, location: e.target.value }));
+                    setError(null);
+                  }}
+                  aria-invalid={!!error}
+                  aria-describedby={error ? "search-error" : undefined}
+                  disabled={isLoading}
+                />
+                {error && (
+                  <div id="search-error" className={styles.searchError} role="alert">
+                    {error}
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.datePickerWrapper}>
+                <button
+                  ref={datePickerButtonRef}
+                  type="button"
+                  className={styles.datePickerButton}
+                  onClick={() => {
+                    // Убираем сброс конечной даты при открытии календаря
+                    setIsDatePickerOpen(!isDatePickerOpen);
+                  }}
+                  aria-expanded={isDatePickerOpen}
+                >
+                  <CalendarIcon className={styles.datePickerIcon} aria-hidden="true" />
+                  <div className={styles.datePickerText}>
+                    <span className={styles.datePickerLabel}>Даты</span>
+                    <span className={styles.datePickerValue}>
+                      {format(searchParams.checkIn, 'd MMM', { locale: ru })}
+                      {searchParams.checkOut ? ` — ${format(searchParams.checkOut, 'd MMM', { locale: ru })}` : ''}
+                    </span>
+                  </div>
+                </button>
+                <DatePickerPortal
+                  isOpen={isDatePickerOpen}
+                  onClose={() => {
+                    setIsDatePickerOpen(false);
+                  }}
+                  selectedDates={{ 
+                    start: searchParams.checkIn, 
+                    end: searchParams.checkOut 
+                  }}
+                  onDateSelect={handleDateChange}
+                  buttonRef={datePickerButtonRef}
+                />
+              </div>
+
+              <div className={styles.guestPickerWrapper}>
+                <button
+                  ref={guestPickerButtonRef}
+                  type="button"
+                  className={styles.guestPickerButton}
+                  onClick={() => setIsGuestPickerOpen(!isGuestPickerOpen)}
+                  aria-expanded={isGuestPickerOpen}
+                >
+                  <Users className={styles.guestPickerIcon} aria-hidden="true" />
+                  <div className={styles.guestPickerText}>
+                    <span className={styles.guestPickerLabel}>Гости</span>
+                    <span className={styles.guestPickerValue}>
+                      {searchParams.guests}
+                    </span>
+                  </div>
+                </button>
+                <GuestPickerPortal
+                  isOpen={isGuestPickerOpen}
+                  onClose={() => setIsGuestPickerOpen(false)}
+                  guests={searchParams.guests}
+                  onGuestChange={handleGuestChange}
+                  buttonRef={guestPickerButtonRef}
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                className={`${styles.searchButton} ${isLoading ? styles.searchButtonLoading : ""}`}
                 disabled={isLoading}
-              />
-              {error && (
-                <div id="search-error" className={styles.searchError} role="alert">
-                  {error}
-                </div>
-              )}
+                aria-busy={isLoading}
+              >
+                {isLoading ? (
+                  <span className={styles.searchButtonContent}>
+                    <span className={styles.searchButtonSpinner} aria-hidden="true" />
+                    Поиск...
+                  </span>
+                ) : (
+                  <span className={styles.searchButtonContent}>
+                    <Search className={styles.searchButtonIcon} aria-hidden="true" />
+                    Найти идеальное место
+                  </span>
+                )}
+              </button>
             </div>
-            <button 
-              type="submit" 
-              className={`${styles.searchButton} ${isLoading ? styles.searchButtonLoading : ""}`}
-              disabled={isLoading}
-              aria-busy={isLoading}
-            >
-              {isLoading ? (
-                <span className={styles.searchButtonContent}>
-                  <span className={styles.searchButtonSpinner} aria-hidden="true" />
-                  Поиск...
-                </span>
-              ) : (
-                <span className={styles.searchButtonContent}>
-                  <Search className={styles.searchButtonIcon} aria-hidden="true" />
-                  Найти идеальное место
-                </span>
-              )}
-            </button>
           </form>
 
-          <div className={styles.searchTags} role="list" aria-label="Популярные фильтры">
-            <button 
-              className={styles.searchTag}
-              onClick={() => setSearchQuery(prev => prev + " транспорт")}
-              type="button"
-              role="listitem"
-            >
-              <Train className={styles.searchTagIcon} aria-hidden="true" />
-              Транспорт
-            </button>
-            <button 
-              className={styles.searchTag}
-              onClick={() => setSearchQuery(prev => prev + " интернет")}
-              type="button"
-              role="listitem"
-            >
-              <Wifi className={styles.searchTagIcon} aria-hidden="true" />
-              Интернет
-            </button>
-            <button 
-              className={styles.searchTag}
-              onClick={() => setSearchQuery(prev => prev + " кафе")}
-              type="button"
-              role="listitem"
-            >
-              <Coffee className={styles.searchTagIcon} aria-hidden="true" />
-              Кафе
-            </button>
-            <button 
-              className={styles.searchTag}
-              onClick={() => setSearchQuery(prev => prev + " магазины")}
-              type="button"
-              role="listitem"
-            >
-              <ShoppingBag className={styles.searchTagIcon} aria-hidden="true" />
-              Магазины
-            </button>
-          </div>
+          {activeTab === "housing" && (
+            <div className={styles.searchTags} role="list" aria-label="Типы жилья">
+              {housingTypes.map(({ type, label, icon: Icon }) => (
+                <button 
+                  key={type}
+                  className={`${styles.searchTag} ${searchParams.housingTypes.includes(type) ? styles.searchTagSelected : ""}`}
+                  onClick={() => handleHousingTypeClick(type)}
+                  type="button"
+                  role="listitem"
+                  aria-pressed={searchParams.housingTypes.includes(type)}
+                >
+                  <Icon className={styles.searchTagIcon} aria-hidden="true" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
