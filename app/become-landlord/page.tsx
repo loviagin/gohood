@@ -81,9 +81,9 @@ export default function BecomeLandlord() {
           <p className={styles.ctaSubtitle}>
             Зарегистрируйтесь как арендодатель и разместите своё первое объявление
           </p>
-          <button className={styles.ctaButton}>
+          <a href="/become-landlord/register" className={styles.ctaButton}>
             Стать арендодателем
-          </button>
+          </a>
         </div>
       </section>
     </main>

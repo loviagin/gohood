@@ -7,7 +7,7 @@ export default function Features() {
       <div className={styles.container}>
         <h2 className={styles.title}>Почему выбирают GoHood.city</h2>
         <p className={styles.subtitle}>
-          Мы создали сервис, который помогает найти не просто жильё, а место, где вам будет комфортно жить и работать
+          GoHood — не просто аренда. Это комфорт в каждом районе
         </p>
         <div className={styles.grid}>
           <div className={styles.card}>
@@ -38,15 +38,15 @@ export default function Features() {
             <Building2 className={styles.icon} />
             <h3 className={styles.cardTitle}>Разные форматы жилья</h3>
             <p className={styles.description}>
-              Квартиры, дома, апартаменты и комнаты — выбирайте под свои нужды
+              Номера, квартиры, дома, хостелы — собственные и с популярных площадок
             </p>
           </div>
 
           <div className={styles.card}>
             <Globe className={styles.icon} />
-            <h3 className={styles.cardTitle}>Международные города</h3>
+            <h3 className={styles.cardTitle}>Расскажем про город</h3>
             <p className={styles.description}>
-              Жильё в России, Италии, Великобритании и других странах
+              Как пользоваться транспортом, как добраться до квартиры, мобильные операторы, банки и многое другое
             </p>
           </div>
 

@@ -1,4 +1,5 @@
 import styles from "./Cities.module.css";
+import Link from "next/link";
 
 const cities = [
   { name: "Москва", image: "/images/moscow.jpg" },
@@ -30,6 +31,11 @@ export default function Cities() {
               </div>
             </div>
           ))}
+        </div>
+        <div className={styles.buttonContainer}>
+          <Link href="/cities" className={styles.allCitiesButton}>
+            Все города
+          </Link>
         </div>
       </div>
     </section>

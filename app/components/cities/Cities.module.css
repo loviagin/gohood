@@ -210,4 +210,25 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.allCitiesButton {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background-color: #0070f3;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.allCitiesButton:hover {
+  background-color: #0051b3;
 } 
