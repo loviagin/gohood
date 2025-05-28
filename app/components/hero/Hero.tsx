@@ -1,5 +1,5 @@
 "use client"
-import { Wifi, MapPin, Sparkles, ConciergeBell, Map, Search, Home, Building2, House, Building, Users, Calendar as CalendarIcon, Footprints, Wifi as WifiIcon, Train, Coffee, Briefcase } from "lucide-react";
+import { Wifi, MapPin, Sparkles, ConciergeBell, Map, Search, Home, Building2, House, Building, Users, Calendar as CalendarIcon } from "lucide-react";
 import { useState, FormEvent, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Hero.module.css";
@@ -357,14 +357,6 @@ const GuestPickerPortal = ({
   return createPortal(portalContent, buttonRef.current?.parentElement || document.body);
 };
 
-const aiPreferences = [
-  { icon: Footprints, label: "Люблю пешие прогулки" },
-  { icon: Briefcase, label: "Работаю удалённо" },
-  { icon: Train, label: "Важен транспорт" },
-  { icon: WifiIcon, label: "Нужен быстрый интернет" },
-  { icon: Coffee, label: "Люблю кафе рядом" },
-];
-
 export default function Hero() {
   const [activeTab, setActiveTab] = useState<SearchTab>("housing");
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -472,19 +464,7 @@ export default function Hero() {
         <div className={styles.heroFeatures} role="list" aria-label="Преимущества сервиса">
           <div className={styles.heroFeature} role="listitem">
             <Sparkles className={styles.heroFeatureIcon} aria-hidden="true" />
-            <div>
-              <span>ИИ подбирает варианты под ваши предпочтения</span>
-              <div className={styles.aiPreferences}>
-                <div className={styles.aiPreferencesList}>
-                  {aiPreferences.map(({ icon: Icon, label }) => (
-                    <span key={label} className={styles.aiPreferenceTag}>
-                      <Icon className={styles.aiPreferenceIcon} aria-hidden="true" />
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <span>ИИ подбирает варианты под ваши предпочтения</span>
           </div>
           <div className={styles.heroFeature} role="listitem">
             <Map className={styles.heroFeatureIcon} aria-hidden="true" />
