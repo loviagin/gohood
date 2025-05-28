@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   description:
     "Отели, квартиры, дома, коттеджи, хостелы, апартаменты и другие варианты жилья в России и за рубежом с ИИ подбором районов",
   keywords: ["GoHood", "Умный поиск жилья", "Подбор районов", "Отели", "Квартиры", "Котеджи", "Хостелы", "Апартаменты"],
-    icons: {
+  icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
@@ -43,6 +43,23 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <head>
+          <script
+            data-noptimize="1"
+            data-cfasync="false"
+            data-wpfc-render="false"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  var script = document.createElement("script");
+                  script.async = 1;
+                  script.src = 'https://emrld.cc/NDIxMjAw.js?t=421200';
+                  document.head.appendChild(script);
+                })();
+              `
+            }}
+          />
+        </head>
         <Providers>
           <Header />
           {children}
