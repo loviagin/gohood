@@ -19,40 +19,40 @@ interface SearchParams {
 
 type DateSelection = { type: 'start' | 'end', date: Date };
 
-const DatePickerCalendar = ({ 
-  selectedDates, 
-  onDateSelect, 
-  onClose 
-}: { 
-  selectedDates: { start: Date; end: Date | null }; 
-  onDateSelect: (selection: DateSelection) => void; 
+const DatePickerCalendar = ({
+  selectedDates,
+  onDateSelect,
+  onClose
+}: {
+  selectedDates: { start: Date; end: Date | null };
+  onDateSelect: (selection: DateSelection) => void;
   onClose: () => void;
 }) => {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(selectedDates.start));
   const [isSelectingEnd, setIsSelectingEnd] = useState(false);
-  
+
   // Сбрасываем состояние при открытии календаря
   useEffect(() => {
     setIsSelectingEnd(false);
   }, []);
 
   const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  const days = eachDayOfInterval({ 
-    start: startOfMonth(currentMonth), 
-    end: endOfMonth(currentMonth) 
+  const days = eachDayOfInterval({
+    start: startOfMonth(currentMonth),
+    end: endOfMonth(currentMonth)
   });
 
   // Добавляем дни предыдущего месяца для заполнения первой недели
   const firstDayOfMonth = startOfMonth(currentMonth);
   const firstDayOfWeek = firstDayOfMonth.getDay() || 7;
-  const prevMonthDays = Array.from({ length: firstDayOfWeek - 1 }, (_, i) => 
+  const prevMonthDays = Array.from({ length: firstDayOfWeek - 1 }, (_, i) =>
     subDays(firstDayOfMonth, firstDayOfWeek - 1 - i)
   );
 
   // Добавляем дни следующего месяца для заполнения последней недели
   const lastDayOfMonth = endOfMonth(currentMonth);
   const lastDayOfWeek = lastDayOfMonth.getDay() || 7;
-  const nextMonthDays = Array.from({ length: 7 - lastDayOfWeek }, (_, i) => 
+  const nextMonthDays = Array.from({ length: 7 - lastDayOfWeek }, (_, i) =>
     addDays(lastDayOfMonth, i + 1)
   );
 
@@ -84,7 +84,7 @@ const DatePickerCalendar = ({
 
   const handleDateClick = (date: Date) => {
     if (isDateDisabled(date)) return;
-    
+
     if (!isSelectingEnd) {
       // Если мы не в режиме выбора конечной даты, значит выбираем начальную
       onDateSelect({ type: 'start', date });
@@ -106,8 +106,8 @@ const DatePickerCalendar = ({
   return (
     <div className={styles.calendar}>
       <div className={styles.calendarHeader}>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className={styles.calendarNavButton}
           onClick={handlePrevMonth}
           disabled={currentMonth <= startOfMonth(today)}
@@ -118,8 +118,8 @@ const DatePickerCalendar = ({
         <span className={styles.calendarMonth}>
           {format(currentMonth, 'LLLL yyyy', { locale: ru })}
         </span>
-        <button 
-          type="button" 
+        <button
+          type="button"
           className={styles.calendarNavButton}
           onClick={handleNextMonth}
           aria-label="Следующий месяц"
@@ -168,13 +168,13 @@ const DatePickerCalendar = ({
   );
 };
 
-const DatePickerPortal = ({ 
-  isOpen, 
-  onClose, 
-  selectedDates, 
+const DatePickerPortal = ({
+  isOpen,
+  onClose,
+  selectedDates,
   onDateSelect,
   buttonRef
-}: { 
+}: {
   isOpen: boolean;
   onClose: () => void;
   selectedDates: { start: Date; end: Date | null };
@@ -240,11 +240,11 @@ const DatePickerPortal = ({
 
   const portalContent = (
     <>
-      <div 
+      <div
         className={styles.datePickerOverlay}
         onClick={onClose}
       />
-      <div 
+      <div
         ref={dropdownRef}
         className={styles.datePickerDropdown}
         style={!isMobile ? {
@@ -264,13 +264,13 @@ const DatePickerPortal = ({
   return createPortal(portalContent, document.body);
 };
 
-const GuestPickerPortal = ({ 
-  isOpen, 
-  onClose, 
+const GuestPickerPortal = ({
+  isOpen,
+  onClose,
   guests,
   onGuestChange,
   buttonRef
-}: { 
+}: {
   isOpen: boolean;
   onClose: () => void;
   guests: number;
@@ -314,12 +314,12 @@ const GuestPickerPortal = ({
   const portalContent = (
     <>
       {isMobile && (
-        <div 
+        <div
           className={styles.datePickerOverlay}
           onClick={onClose}
         />
       )}
-      <div 
+      <div
         ref={dropdownRef}
         className={styles.guestPickerDropdown}
       >
@@ -445,10 +445,10 @@ export default function Hero() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -460,7 +460,7 @@ export default function Hero() {
           <br />
           <span className={styles.titleHighlight}>в идеальном районе</span>
         </h1>
-        
+
         <div className={styles.heroFeatures} role="list" aria-label="Преимущества сервиса">
           <div className={styles.heroFeature} role="listitem">
             <Sparkles className={styles.heroFeatureIcon} aria-hidden="true" />
@@ -475,7 +475,7 @@ export default function Hero() {
             <span>Реальные спидтесты Wi-Fi и проверка качества жизни</span>
           </div>
         </div>
-        
+
         <div className={styles.searchContainer}>
           <div className={styles.searchTabs} role="tablist">
             <button
@@ -498,14 +498,17 @@ export default function Hero() {
             </button>
           </div>
 
-          <form 
-            className={styles.searchForm} 
+          <form
+            className={styles.searchForm}
             onSubmit={handleSearch}
             id="search-form"
             role="search"
             aria-label={`Поиск ${activeTab === "housing" ? "жилья" : "районов"}`}
           >
-            <div className={styles.searchInputsGrid}>
+            <div 
+              className={styles.searchInputsGrid}
+              data-tab={activeTab}
+            >
               <div className={styles.searchInputWrapper}>
                 <MapPin className={styles.searchInputIcon} aria-hidden="true" />
                 <input
@@ -528,67 +531,71 @@ export default function Hero() {
                 )}
               </div>
 
-              <div className={styles.datePickerWrapper}>
-                <button
-                  ref={datePickerButtonRef}
-                  type="button"
-                  className={styles.datePickerButton}
-                  onClick={() => {
-                    // Убираем сброс конечной даты при открытии календаря
-                    setIsDatePickerOpen(!isDatePickerOpen);
-                  }}
-                  aria-expanded={isDatePickerOpen}
-                >
-                  <CalendarIcon className={styles.datePickerIcon} aria-hidden="true" />
-                  <div className={styles.datePickerText}>
-                    <span className={styles.datePickerLabel}>Даты</span>
-                    <span className={styles.datePickerValue}>
-                      {format(searchParams.checkIn, 'd MMM', { locale: ru })}
-                      {searchParams.checkOut ? ` — ${format(searchParams.checkOut, 'd MMM', { locale: ru })}` : ''}
-                    </span>
+              {activeTab === "housing" && (
+                <>
+                  <div className={styles.datePickerWrapper}>
+                    <button
+                      ref={datePickerButtonRef}
+                      type="button"
+                      className={styles.datePickerButton}
+                      onClick={() => {
+                        // Убираем сброс конечной даты при открытии календаря
+                        setIsDatePickerOpen(!isDatePickerOpen);
+                      }}
+                      aria-expanded={isDatePickerOpen}
+                    >
+                      <CalendarIcon className={styles.datePickerIcon} aria-hidden="true" />
+                      <div className={styles.datePickerText}>
+                        <span className={styles.datePickerLabel}>Даты</span>
+                        <span className={styles.datePickerValue}>
+                          {format(searchParams.checkIn, 'd MMM', { locale: ru })}
+                          {searchParams.checkOut ? ` — ${format(searchParams.checkOut, 'd MMM', { locale: ru })}` : ''}
+                        </span>
+                      </div>
+                    </button>
+                    <DatePickerPortal
+                      isOpen={isDatePickerOpen}
+                      onClose={() => {
+                        setIsDatePickerOpen(false);
+                      }}
+                      selectedDates={{
+                        start: searchParams.checkIn,
+                        end: searchParams.checkOut
+                      }}
+                      onDateSelect={handleDateChange}
+                      buttonRef={datePickerButtonRef}
+                    />
                   </div>
-                </button>
-                <DatePickerPortal
-                  isOpen={isDatePickerOpen}
-                  onClose={() => {
-                    setIsDatePickerOpen(false);
-                  }}
-                  selectedDates={{ 
-                    start: searchParams.checkIn, 
-                    end: searchParams.checkOut 
-                  }}
-                  onDateSelect={handleDateChange}
-                  buttonRef={datePickerButtonRef}
-                />
-              </div>
 
-              <div className={styles.guestPickerWrapper}>
-                <button
-                  ref={guestPickerButtonRef}
-                  type="button"
-                  className={styles.guestPickerButton}
-                  onClick={() => setIsGuestPickerOpen(!isGuestPickerOpen)}
-                  aria-expanded={isGuestPickerOpen}
-                >
-                  <Users className={styles.guestPickerIcon} aria-hidden="true" />
-                  <div className={styles.guestPickerText}>
-                    <span className={styles.guestPickerLabel}>Гости</span>
-                    <span className={styles.guestPickerValue}>
-                      {searchParams.guests}
-                    </span>
+                  <div className={styles.guestPickerWrapper}>
+                    <button
+                      ref={guestPickerButtonRef}
+                      type="button"
+                      className={styles.guestPickerButton}
+                      onClick={() => setIsGuestPickerOpen(!isGuestPickerOpen)}
+                      aria-expanded={isGuestPickerOpen}
+                    >
+                      <Users className={styles.guestPickerIcon} aria-hidden="true" />
+                      <div className={styles.guestPickerText}>
+                        <span className={styles.guestPickerLabel}>Гости</span>
+                        <span className={styles.guestPickerValue}>
+                          {searchParams.guests}
+                        </span>
+                      </div>
+                    </button>
+                    <GuestPickerPortal
+                      isOpen={isGuestPickerOpen}
+                      onClose={() => setIsGuestPickerOpen(false)}
+                      guests={searchParams.guests}
+                      onGuestChange={handleGuestChange}
+                      buttonRef={guestPickerButtonRef}
+                    />
                   </div>
-                </button>
-                <GuestPickerPortal
-                  isOpen={isGuestPickerOpen}
-                  onClose={() => setIsGuestPickerOpen(false)}
-                  guests={searchParams.guests}
-                  onGuestChange={handleGuestChange}
-                  buttonRef={guestPickerButtonRef}
-                />
-              </div>
+                </>
+              )}
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className={`${styles.searchButton} ${isLoading ? styles.searchButtonLoading : ""}`}
                 disabled={isLoading}
                 aria-busy={isLoading}
@@ -611,7 +618,7 @@ export default function Hero() {
           {activeTab === "housing" && (
             <div className={styles.searchTags} role="list" aria-label="Типы жилья">
               {housingTypes.map(({ type, label, icon: Icon }) => (
-                <button 
+                <button
                   key={type}
                   className={`${styles.searchTag} ${searchParams.housingTypes.includes(type) ? styles.searchTagSelected : ""}`}
                   onClick={() => handleHousingTypeClick(type)}

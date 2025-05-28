@@ -192,6 +192,11 @@
   margin-bottom: 1.5rem;
 }
 
+/* Добавляем новый стиль для вкладки "Исследовать районы" */
+.searchInputsGrid[data-tab="districts"] {
+  grid-template-columns: 1fr;
+}
+
 .searchInputWrapper {
   position: relative;
   width: 100%;
@@ -710,6 +715,10 @@
   .searchInputsGrid {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+  
+  .searchInputsGrid[data-tab="districts"] {
+    grid-template-columns: 1fr;
   }
   
   .searchInput,
