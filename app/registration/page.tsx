@@ -289,7 +289,7 @@ function RegistrationForm() {
 
     const handleSocialSignIn = (provider: string) => {
         signIn(provider, { 
-            callbackUrl: '/registration?step=details'
+            callbackUrl: '/registration?step=details&role=' + selectedRole
         });
     };
 
