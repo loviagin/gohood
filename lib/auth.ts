@@ -202,8 +202,8 @@ export const authOptions: AuthOptions = {
             }
         })
     ],
-    pages: {
-        signIn: '/signin',
-    },
+    // pages: {
+    //     signIn: '/signin',
+    // },
     secret: process.env.NEXTAUTH_SECRET
 }; 
