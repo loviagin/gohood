@@ -4,7 +4,7 @@ export interface IUser extends Document {
   email: string;
   name?: string;
   passwordHash?: string;
-  role: 'user' | 'admin' | 'owner' | 'landlord';
+  role: 'user' | 'admin' | 'tenant' | 'landlord';
   phone?: string;
   favorites: mongoose.Types.ObjectId[];
   createdAt: Date;
@@ -36,7 +36,7 @@ const UserSchema = new Schema<IUser>(
         message: 'Password is required for non-social login users'
       }
     },
-    role: { type: String, enum: ['user', 'admin', 'owner', 'landlord'], default: 'user' },
+    role: { type: String, enum: ['user', 'admin', 'tenant', 'landlord'], default: 'user' },
     phone: { type: String, required: false },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing' }],
     companyName: String,

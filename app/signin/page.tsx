@@ -59,7 +59,7 @@ export default function SignIn() {
     };
 
     const handleTenantRegistration = () => {
-        router.push('/registration?role=owner');
+        router.push('/registration?role=tenant');
     };
 
     const handleLandlordRegistration = () => {

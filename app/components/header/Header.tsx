@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
-import { FaUser, FaSignOutAlt, FaCog, FaBuilding, FaBars, FaTimes } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaCog, FaBars, FaTimes } from 'react-icons/fa';
 import styles from './Header.module.css';
 
 export default function Header() {

@@ -11,7 +11,7 @@ import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
 type RegistrationStep = 'auth' | 'details';
-type UserRole = 'landlord' | 'owner';
+type UserRole = 'landlord' | 'tenant';
 
 // Client component that uses useSearchParams
 function RegistrationForm() {
@@ -20,7 +20,7 @@ function RegistrationForm() {
     const { data: session, update: updateSession } = useSession();
     const [selectedRole, setSelectedRole] = useState<UserRole>(() => {
         const roleParam = searchParams.get('role');
-        return (roleParam === 'owner' || roleParam === 'landlord') ? roleParam : 'landlord';
+        return (roleParam === 'tenant' || roleParam === 'landlord') ? roleParam : 'landlord';
     });
     const [currentStep, setCurrentStep] = useState<RegistrationStep>(
         session ? 'details' : 'auth'
@@ -77,7 +77,7 @@ function RegistrationForm() {
     // Update role when URL changes
     useEffect(() => {
         const roleParam = searchParams.get('role');
-        if (roleParam === 'owner' || roleParam === 'landlord') {
+        if (roleParam === 'tenant' || roleParam === 'landlord') {
             setSelectedRole(roleParam);
         }
     }, [searchParams]);
@@ -316,8 +316,8 @@ function RegistrationForm() {
                         </button>
                         <button
                             type="button"
-                            className={`${styles.roleButton} ${selectedRole === 'owner' ? styles.roleButtonActive : ''}`}
-                            onClick={() => setSelectedRole('owner')}
+                            className={`${styles.roleButton} ${selectedRole === 'tenant' ? styles.roleButtonActive : ''}`}
+                            onClick={() => setSelectedRole('tenant')}
                         >
                             <span className={styles.roleIcon}>🔑</span>
                             <span className={styles.roleText}>Арендатор</span>
