@@ -109,7 +109,6 @@ export const authOptions: AuthOptions = {
                     if (existingUser) {
                         // Update existing user's social ID and name
                         const updateData: any = {
-                            name: user.name,
                             updatedAt: new Date()
                         };
 
@@ -117,6 +116,7 @@ export const authOptions: AuthOptions = {
                         if (account.provider === 'google') updateData.googleId = profile?.sub;
                         if (account.provider === 'yandex') updateData.yandexId = profile?.sub;
                         if (account.provider === 'vk') updateData.vkId = profile?.sub;
+                        if (account.provider === 'apple') updateData.appleId = profile?.sub;
 
                         await UserModel.findOneAndUpdate(
                             { email: user.email },
@@ -136,6 +136,7 @@ export const authOptions: AuthOptions = {
                         if (account.provider === 'google') newUserData.googleId = profile?.sub;
                         if (account.provider === 'yandex') newUserData.yandexId = profile?.sub;
                         if (account.provider === 'vk') newUserData.vkId = profile?.sub;
+                        if (account.provider === 'apple') newUserData.appleId = profile?.sub;
 
                         await UserModel.create(newUserData);
                     }
