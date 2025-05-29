@@ -162,11 +162,10 @@ export const authOptions: AuthOptions = {
             clientId: process.env.APPLE_CLIENT_ID!,
             clientSecret: process.env.AUTH_APPLE_SECRET!,
             wellKnown: "https://appleid.apple.com/.well-known/openid-configuration",
-            authorization: { 
-                params: { 
+            authorization: {
+                params: {
                     scope: "openid name email",
-                    response_mode: "form_post",
-                    redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/apple?callbackUrl=/become-landlord/register`
+                    response_mode: "form_post"
                 }
             },
             profile(profile) {
