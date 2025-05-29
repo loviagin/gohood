@@ -3,6 +3,7 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import YandexProvider from "next-auth/providers/yandex";
+import AppleProvider from "next-auth/providers/apple";
 import VkProvider from "next-auth/providers/vk";
 import UserModel from "@/models/User";
 import bcrypt from "bcryptjs";
@@ -84,19 +85,19 @@ export const authOptions: AuthOptions = {
             try {
                 if (account?.provider === 'google' || account?.provider === 'yandex' || account?.provider === 'vk') {
                     const existingUser = await UserModel.findOne({ email: user.email });
-                    
+
                     if (existingUser) {
                         // Update existing user's social ID and name
                         const updateData: any = {
                             name: user.name,
                             updatedAt: new Date()
                         };
-                        
+
                         // Set the appropriate social ID based on provider
                         if (account.provider === 'google') updateData.googleId = profile?.sub;
                         if (account.provider === 'yandex') updateData.yandexId = profile?.sub;
                         if (account.provider === 'vk') updateData.vkId = profile?.sub;
-                        
+
                         await UserModel.findOneAndUpdate(
                             { email: user.email },
                             updateData,
@@ -110,12 +111,12 @@ export const authOptions: AuthOptions = {
                             role: 'landlord',
                             profileCompleted: false
                         };
-                        
+
                         // Set the appropriate social ID based on provider
                         if (account.provider === 'google') newUserData.googleId = profile?.sub;
                         if (account.provider === 'yandex') newUserData.yandexId = profile?.sub;
                         if (account.provider === 'vk') newUserData.vkId = profile?.sub;
-                        
+
                         await UserModel.create(newUserData);
                     }
                 }
@@ -135,6 +136,10 @@ export const authOptions: AuthOptions = {
                     scope: "login:email login:info"
                 }
             }
+        }),
+        AppleProvider({
+            clientId: process.env.APPLE_CLIENT_ID!,
+            clientSecret: process.env.AUTH_APPLE_SECRET!,
         }),
         VkProvider({
             clientId: process.env.VK_CLIENT_ID!,
@@ -166,5 +171,8 @@ export const authOptions: AuthOptions = {
             }
         })
     ],
+    pages: {
+        signIn: '/signin',
+    },
     secret: process.env.NEXTAUTH_SECRET
 }; 
