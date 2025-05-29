@@ -2,18 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
-// import { FaYandex } from 'react-icons/fa';
-// import { FaVk } from 'react-icons/fa';
+import { FaApple } from 'react-icons/fa';
+import { FaYandex } from 'react-icons/fa';
+import { FaVk } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
 type RegistrationStep = 'auth' | 'details';
+type UserRole = 'landlord' | 'tenant';
 
 export default function LandlordRegister() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { data: session, update: updateSession } = useSession();
+    const [selectedRole, setSelectedRole] = useState<UserRole>(() => {
+        const roleParam = searchParams.get('role');
+        return (roleParam === 'tenant' || roleParam === 'landlord') ? roleParam : 'landlord';
+    });
     const [currentStep, setCurrentStep] = useState<RegistrationStep>(
         session ? 'details' : 'auth'
     );
@@ -59,6 +66,21 @@ export default function LandlordRegister() {
         }
     }, [session]);
 
+    // Update URL when role changes
+    useEffect(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('role', selectedRole);
+        window.history.replaceState({}, '', url.toString());
+    }, [selectedRole]);
+
+    // Update role when URL changes
+    useEffect(() => {
+        const roleParam = searchParams.get('role');
+        if (roleParam === 'tenant' || roleParam === 'landlord') {
+            setSelectedRole(roleParam);
+        }
+    }, [searchParams]);
+
     const handleAuthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAuthData({
             ...authData,
@@ -67,10 +89,58 @@ export default function LandlordRegister() {
     };
 
     const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setProfileData({
-            ...profileData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+        
+        if (name === 'phone') {
+            // Оставляем только цифры и первый плюс
+            let numbers = value.replace(/[^\d+]/g, '');
+            
+            // Убираем все плюсы кроме первого
+            if (numbers.includes('+')) {
+                numbers = '+' + numbers.replace(/\+/g, '');
+            } else {
+                numbers = '+' + numbers;
+            }
+            
+            // Форматируем номер
+            let result = '';
+            const digits = numbers.slice(1); // убираем плюс для форматирования
+            
+            if (digits.length > 0) {
+                result = '+' + digits[0]; // код страны
+                
+                if (digits.length > 1) {
+                    result += ' (' + digits.slice(1, 4);
+                    
+                    if (digits.length > 4) {
+                        result += ') ' + digits.slice(4, 7);
+                        
+                        if (digits.length > 7) {
+                            result += '-' + digits.slice(7, 9);
+                            
+                            if (digits.length > 9) {
+                                result += '-' + digits.slice(9, 11);
+                            }
+                        }
+                    } else {
+                        result += ')';
+                    }
+                }
+            }
+            
+            console.log('Input value:', value);
+            console.log('Formatted number:', result);
+            
+            setProfileData(prev => ({
+                ...prev,
+                [name]: result
+            }));
+        } else {
+            setProfileData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -86,7 +156,7 @@ export default function LandlordRegister() {
                 body: JSON.stringify({
                     email: authData.email,
                     password: authData.password,
-                    role: 'owner'
+                    role: selectedRole
                 }),
             });
 
@@ -99,7 +169,7 @@ export default function LandlordRegister() {
                         email: authData.email,
                         password: authData.password,
                         redirect: false,
-                        callbackUrl: '/rent/register'
+                        callbackUrl: '/registration?role=' + selectedRole
                     });
 
                     if (signInResult?.error) {
@@ -125,7 +195,7 @@ export default function LandlordRegister() {
                 email: authData.email,
                 password: authData.password,
                 redirect: false,
-                callbackUrl: '/become-landlord/register'
+                callbackUrl: '/registration?role=' + selectedRole
             });
 
             if (result?.error) {
@@ -212,7 +282,7 @@ export default function LandlordRegister() {
 
     const handleSocialSignIn = (provider: string) => {
         signIn(provider, { 
-            callbackUrl: '/rent/register?step=details'
+            callbackUrl: '/registration?step=details'
         });
     };
 
@@ -221,10 +291,31 @@ export default function LandlordRegister() {
             <div className={styles.container}>
                 <div className={styles.content}>
                     <div className={styles.header}>
-                        <h1 className={styles.title}>Зарегистрируйтесь для аренды жилья</h1>
+                        <h1 className={styles.title}>Регистрация</h1>
                         <p className={styles.subtitle}>
-                            Создайте аккаунт, чтобы начать снимать жилье
+                            Создайте аккаунт, чтобы начать размещать свои объекты или искать жилье
                         </p>
+                    </div>
+
+                    <div className={styles.roleSelector}>
+                        <button
+                            type="button"
+                            className={`${styles.roleButton} ${selectedRole === 'landlord' ? styles.roleButtonActive : ''}`}
+                            onClick={() => setSelectedRole('landlord')}
+                        >
+                            <span className={styles.roleIcon}>🏠</span>
+                            <span className={styles.roleText}>Арендодатель</span>
+                            <span className={styles.roleDescription}>Размещаю недвижимость</span>
+                        </button>
+                        <button
+                            type="button"
+                            className={`${styles.roleButton} ${selectedRole === 'tenant' ? styles.roleButtonActive : ''}`}
+                            onClick={() => setSelectedRole('tenant')}
+                        >
+                            <span className={styles.roleIcon}>🔑</span>
+                            <span className={styles.roleText}>Арендатор</span>
+                            <span className={styles.roleDescription}>Ищу жилье</span>
+                        </button>
                     </div>
 
                     <form className={styles.form} onSubmit={handleAuthSubmit}>
@@ -282,7 +373,15 @@ export default function LandlordRegister() {
                             Войти через Google
                         </button>
 
-                        {/* <button
+                        <button
+                            onClick={() => handleSocialSignIn('apple')}
+                            className={styles.appleButton}
+                        >
+                            <FaApple className={styles.socialIcon} />
+                            Войти через Apple
+                        </button>
+
+                        <button
                             onClick={() => handleSocialSignIn('yandex')}
                             className={styles.yandexButton}
                         >
@@ -296,7 +395,7 @@ export default function LandlordRegister() {
                         >
                             <FaVk className={styles.socialIcon} />
                             Войти через ВКонтакте
-                        </button> */}
+                        </button>
                     </div>
 
                     <div className={styles.loginLink}>
@@ -345,11 +444,23 @@ export default function LandlordRegister() {
                             id="phone"
                             name="phone"
                             type="tel"
-                            required
                             value={profileData.phone}
                             onChange={handleProfileChange}
+                            onKeyDown={(e) => {
+                                // Разрешаем только цифры, плюс, бэкспейс и удаление
+                                if (!/[\d+]/.test(e.key) && 
+                                    e.key !== 'Backspace' && 
+                                    e.key !== 'Delete' && 
+                                    e.key !== 'ArrowLeft' && 
+                                    e.key !== 'ArrowRight' &&
+                                    e.key !== 'Tab') {
+                                    e.preventDefault();
+                                }
+                            }}
                             className={styles.input}
-                            placeholder="+7 (___) ___-__-__"
+                            placeholder="+X (XXX) XXX-XX-XX"
+                            maxLength={20}
+                            required
                         />
                     </div>
 

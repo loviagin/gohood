@@ -14,7 +14,7 @@ export default function BecomeLandlord() {
           <p className={styles.subtitle}>
             Размещайте свои объекты на платформе, где арендаторы ценят качество жилья и инфраструктуру района
           </p>
-          <a href="/become-landlord/register" className={styles.ctaButton}>
+          <a href="/registration?role=landlord" className={styles.ctaButton}>
             Начать размещение
           </a>
         </div>
@@ -81,7 +81,7 @@ export default function BecomeLandlord() {
           <p className={styles.ctaSubtitle}>
             Зарегистрируйтесь как арендодатель и разместите своё первое объявление
           </p>
-          <a href="/become-landlord/register" className={styles.ctaButton}>
+          <a href="/registration?role=landlord" className={styles.ctaButton}>
             Стать арендодателем
           </a>
         </div>

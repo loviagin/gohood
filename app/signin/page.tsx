@@ -59,11 +59,11 @@ export default function SignIn() {
     };
 
     const handleTenantRegistration = () => {
-        router.push('/become-landlord/register');
+        router.push('/registration?role=tenant');
     };
 
     const handleLandlordRegistration = () => {
-        router.push('/rent/register');
+        router.push('/registration?role=landlord');
     };
 
     return (
@@ -146,13 +146,13 @@ export default function SignIn() {
                         onClick={handleTenantRegistration}
                         className={styles.registerButton}
                     >
-                        Регистрация для размещения жилья
+                        Регистрация для аренды жилья
                     </button>
                     <button
                         onClick={handleLandlordRegistration}
                         className={styles.registerButton}
                     >
-                        Регистрация для аренды жилья
+                        Регистрация для размещения жилья
                     </button>
                 </div>
             </div>
