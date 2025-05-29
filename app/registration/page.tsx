@@ -148,6 +148,8 @@ function RegistrationForm() {
         e.preventDefault();
         setIsLoading(true);
 
+        console.log('Submitting registration with role:', selectedRole);
+
         try {
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
@@ -162,6 +164,7 @@ function RegistrationForm() {
             });
 
             const data = await res.json();
+            console.log('Registration response:', data);
 
             if (!res.ok) {
                 if (data.error === 'User already exists') {
@@ -223,6 +226,8 @@ function RegistrationForm() {
         e.preventDefault();
         setIsLoading(true);
 
+        console.log('Submitting profile update with role:', selectedRole);
+
         // Ensure we have a valid session
         if (!session?.user?.email) {
             toast.error('Сессия истекла. Пожалуйста, войдите снова.');
@@ -236,10 +241,10 @@ function RegistrationForm() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // This ensures cookies (including session) are sent
+                credentials: 'include',
                 body: JSON.stringify({
                     ...profileData,
-                    role: 'landlord'
+                    role: selectedRole
                 }),
             });
 
@@ -256,7 +261,8 @@ function RegistrationForm() {
             }
 
             const data = await res.json();
-            
+            console.log('Profile update response:', data);
+
             // Обновляем сессию
             await updateSession({
                 ...session,
