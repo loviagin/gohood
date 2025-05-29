@@ -103,7 +103,7 @@ export const authOptions: AuthOptions = {
         },
         async signIn({ user, account, profile }: { user: CustomUser; account: Account | null; profile?: Profile }) {
             try {
-                if (account?.provider === 'google' || account?.provider === 'yandex' || account?.provider === 'vk') {
+                if (account?.provider === 'google' || account?.provider === 'yandex' || account?.provider === 'vk' || account?.provider === 'apple') {
                     const existingUser = await UserModel.findOne({ email: user.email });
 
                     if (existingUser) {
@@ -202,8 +202,8 @@ export const authOptions: AuthOptions = {
             }
         })
     ],
-    // pages: {
-    //     signIn: '/signin',
-    // },
+    pages: {
+        signIn: '/signin',
+    },
     secret: process.env.NEXTAUTH_SECRET
 }; 
