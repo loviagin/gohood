@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
@@ -13,7 +13,8 @@ import styles from './page.module.css';
 type RegistrationStep = 'auth' | 'details';
 type UserRole = 'landlord' | 'tenant';
 
-export default function LandlordRegister() {
+// Client component that uses useSearchParams
+function RegistrationForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { data: session, update: updateSession } = useSession();
@@ -489,5 +490,22 @@ export default function LandlordRegister() {
                 </form>
             </div>
         </div>
+    );
+}
+
+// Main page component
+export default function RegistrationPage() {
+    return (
+        <Suspense fallback={
+            <div className={styles.container}>
+                <div className={styles.content}>
+                    <div className={styles.header}>
+                        <h1 className={styles.title}>Загрузка...</h1>
+                    </div>
+                </div>
+            </div>
+        }>
+            <RegistrationForm />
+        </Suspense>
     );
 }
