@@ -143,8 +143,8 @@ export const authOptions: AuthOptions = {
             authorization: {
                 params: {
                     scope: "name email",
-                    response_type: "code",
-                    use_pkce: true
+                    response_type: "code id_token",
+                    response_mode: "fragment"
                 }
             }
         }),
