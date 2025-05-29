@@ -143,10 +143,22 @@ export const authOptions: AuthOptions = {
             authorization: {
                 params: {
                     scope: "name email",
-                    response_type: "code id_token",
+                    response_type: "code",
                     response_mode: "form_post"
                 }
-            }
+            },
+            token: {
+                url: "https://appleid.apple.com/auth/token",
+                async request({ client, params, checks, provider }) {
+                    const response = await client.oauthCallback(
+                        provider.callbackUrl,
+                        params,
+                        checks,
+                        { exchangeBody: { client_id: provider.clientId } }
+                    );
+                    return { tokens: response };
+                },
+            },
         }),
         VkProvider({
             clientId: process.env.VK_CLIENT_ID!,
