@@ -144,7 +144,7 @@ export const authOptions: AuthOptions = {
                 params: {
                     scope: "name email",
                     response_type: "code id_token",
-                    response_mode: "fragment"
+                    response_mode: "form_post"
                 }
             }
         }),
