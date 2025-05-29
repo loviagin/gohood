@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
+import { FaApple } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
@@ -51,6 +52,10 @@ export default function SignIn() {
 
     const handleGoogleSignIn = () => {
         signIn('google', { callbackUrl: '/' });
+    };
+
+    const handleAppleSignIn = () => {
+        signIn('apple', { callbackUrl: '/' });
     };
 
     const handleTenantRegistration = () => {
@@ -124,6 +129,13 @@ export default function SignIn() {
                     >
                         <FcGoogle className={styles.socialIcon} />
                         Войти через Google
+                    </button>
+                    <button
+                        onClick={handleAppleSignIn}
+                        className={styles.appleButton}
+                    >
+                        <FaApple className={styles.socialIcon} />
+                        Войти через Apple
                     </button>
                 </div>
 
