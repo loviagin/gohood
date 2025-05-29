@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface IUser extends Document {
   email: string;
   name?: string;
-  passwordHash: string;
+  passwordHash?: string;
   role: 'user' | 'admin' | 'owner' | 'landlord';
   phone?: string;
   favorites: mongoose.Types.ObjectId[];
@@ -14,6 +14,7 @@ export interface IUser extends Document {
   googleId?: string;
   yandexId?: string;
   vkId?: string;
+  appleId?: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -23,7 +24,7 @@ const UserSchema = new Schema<IUser>(
     passwordHash: {
       type: String,
       required: function(this: IUser) {
-        return !this.googleId && !this.yandexId && !this.vkId;
+        return !this.googleId && !this.yandexId && !this.vkId && !this.appleId;
       },
       validate: {
         validator: function(this: IUser, value: string) {
