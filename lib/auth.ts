@@ -140,24 +140,16 @@ export const authOptions: AuthOptions = {
         AppleProvider({
             clientId: process.env.APPLE_CLIENT_ID!,
             clientSecret: process.env.AUTH_APPLE_SECRET!,
-            authorization: {
-                params: {
-                    scope: "name email",
-                    response_type: "code",
-                    response_mode: "form_post"
+            wellKnown: "https://appleid.apple.com/.well-known/openid-configuration",
+            authorization: { params: { scope: "openid name email" } },
+            profile(profile) {
+                return {
+                    id: profile.sub,
+                    name: profile.name?.firstName,
+                    email: profile.email,
+                    role: 'landlord',
+                    profileCompleted: false
                 }
-            },
-            token: {
-                url: "https://appleid.apple.com/auth/token",
-                async request({ client, params, checks, provider }) {
-                    const response = await client.oauthCallback(
-                        provider.callbackUrl,
-                        params,
-                        checks,
-                        { exchangeBody: { client_id: provider.clientId } }
-                    );
-                    return { tokens: response };
-                },
             },
         }),
         VkProvider({
