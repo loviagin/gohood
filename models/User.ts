@@ -23,12 +23,10 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: false },
     passwordHash: {
       type: String,
-      required: function(this: IUser) {
-        return !this.googleId && !this.yandexId && !this.vkId && !this.appleId;
-      },
+      required: false,
       validate: {
         validator: function(this: IUser, value: string) {
-          if (this.googleId || this.yandexId || this.vkId) {
+          if (this.googleId || this.yandexId || this.vkId || this.appleId) {
             return value === undefined;
           }
           return value !== undefined;
@@ -43,7 +41,8 @@ const UserSchema = new Schema<IUser>(
     profileCompleted: { type: Boolean, default: false },
     googleId: String,
     yandexId: String,
-    vkId: String
+    vkId: String,
+    appleId: String
   },
   { timestamps: true }
 );
