@@ -140,6 +140,12 @@ export const authOptions: AuthOptions = {
         AppleProvider({
             clientId: process.env.APPLE_CLIENT_ID!,
             clientSecret: process.env.AUTH_APPLE_SECRET!,
+            authorization: {
+                params: {
+                    scope: "name email",
+                    response_mode: "form_post"
+                }
+            }
         }),
         VkProvider({
             clientId: process.env.VK_CLIENT_ID!,
