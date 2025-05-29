@@ -35,6 +35,34 @@ export const authOptions: AuthOptions = {
     session: {
         strategy: "jwt",
     },
+    cookies: {
+        sessionToken: {
+            name: `__Secure-next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: true
+            }
+        },
+        callbackUrl: {
+            name: `__Secure-next-auth.callback-url`,
+            options: {
+                sameSite: 'lax',
+                path: '/',
+                secure: true
+            }
+        },
+        csrfToken: {
+            name: `__Host-next-auth.csrf-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: true
+            }
+        }
+    },
     callbacks: {
         async jwt({ token, user, account }: { token: JWT; user?: CustomUser; account?: Account | null }) {
             if (user) {
@@ -143,7 +171,18 @@ export const authOptions: AuthOptions = {
             authorization: {
                 params: {
                     scope: "name email",
-                    response_mode: "form_post"
+                    response_mode: "form_post",
+                    response_type: "code id_token",
+                    use_pkce: true
+                }
+            },
+            profile(profile) {
+                return {
+                    id: profile.sub,
+                    name: profile.name?.firstName,
+                    email: profile.email,
+                    role: 'landlord',
+                    profileCompleted: false
                 }
             }
         }),
