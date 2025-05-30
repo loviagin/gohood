@@ -281,16 +281,34 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
 }
 
+/* Common styles for all form icons */
+.formIcon {
+  width: 18px;
+  height: 18px;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+}
+
 .searchInputIcon {
+  composes: formIcon;
   position: absolute;
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  color: #94a3b8;
   pointer-events: none;
-  transition: color 0.2s ease;
+}
+
+.datePickerIcon {
+  composes: formIcon;
+}
+
+.guestPickerIcon {
+  composes: formIcon;
+}
+
+.searchButtonIcon {
+  composes: formIcon;
+  color: white;
 }
 
 .searchInput::placeholder {
@@ -328,11 +346,6 @@
   align-items: center;
   gap: 0.5rem;
   height: 100%;
-}
-
-.searchButtonIcon {
-  width: 18px;
-  height: 18px;
 }
 
 .searchButtonLoading {
@@ -1017,10 +1030,12 @@
     font-size: 0.875rem;
   }
 
-  .searchInputIcon {
-    left: 0.75rem;
-    width: 14px;
-    height: 14px;
+  .searchInputIcon,
+  .datePickerIcon,
+  .guestPickerIcon {
+    width: 16px;
+    height: 16px;
+    left: 0.875rem;
   }
 
   .searchButton {
