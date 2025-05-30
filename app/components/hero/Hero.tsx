@@ -1,6 +1,6 @@
 "use client"
 import { Wifi, MapPin, Sparkles, ConciergeBell, Map, Search, Home, Building2, House, Building, Users, Calendar as CalendarIcon } from "lucide-react";
-import { useState, FormEvent, useEffect, useRef } from "react";
+import { useState, FormEvent, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Hero.module.css";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, subDays } from "date-fns";
@@ -9,12 +9,25 @@ import { ru } from "date-fns/locale";
 type SearchTab = "housing" | "districts";
 type HousingType = "apartment" | "house" | "room" | "hostel";
 
+interface CitySuggestion {
+  cityName: string;
+  fullName: string;
+  countryName: string;
+  countryCode: string;
+  id: string;
+  location: {
+    lat: string;
+    lon: string;
+  };
+}
+
 interface SearchParams {
   location: string;
   checkIn: Date;
   checkOut: Date | null;
   guests: number;
   housingTypes: HousingType[];
+  selectedCityId?: string;
 }
 
 type DateSelection = { type: 'start' | 'end', date: Date };
@@ -357,6 +370,110 @@ const GuestPickerPortal = ({
   return createPortal(portalContent, buttonRef.current?.parentElement || document.body);
 };
 
+const SuggestionsPortal = ({
+  isOpen,
+  onClose,
+  suggestions,
+  onSelect,
+  buttonRef
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  suggestions: CitySuggestion[];
+  onSelect: (suggestion: CitySuggestion) => void;
+  buttonRef: React.RefObject<HTMLInputElement>;
+}) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (!isOpen || !buttonRef.current) return;
+
+    const updatePosition = () => {
+      const buttonRect = buttonRef.current?.getBoundingClientRect();
+      if (!buttonRect) return;
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+      setPosition({
+        top: buttonRect.bottom + scrollTop + 8,
+        left: buttonRect.left + scrollLeft
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isOpen, buttonRef]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen || suggestions.length === 0) return null;
+
+  const isMobile = window.innerWidth <= 768;
+
+  const portalContent = (
+    <>
+      <div
+        className={styles.datePickerOverlay}
+        onClick={onClose}
+      />
+      <div
+        ref={dropdownRef}
+        className={styles.suggestionsDropdown}
+        style={!isMobile ? {
+          top: `${position.top}px`,
+          left: `${position.left}px`,
+          width: `${buttonRef.current?.offsetWidth}px`,
+        } : undefined}
+      >
+        {suggestions.map((suggestion) => (
+          <button
+            key={suggestion.id}
+            className={styles.suggestionItem}
+            onClick={() => onSelect(suggestion)}
+            type="button"
+            role="option"
+          >
+            <div className={styles.suggestionCity}>{suggestion.cityName}</div>
+            <div className={styles.suggestionCountry}>{suggestion.countryName}</div>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+
+  return createPortal(portalContent, document.body);
+};
+
 export default function Hero() {
   const [activeTab, setActiveTab] = useState<SearchTab>("housing");
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -371,8 +488,13 @@ export default function Hero() {
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isGuestPickerOpen, setIsGuestPickerOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null!);
   const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
   const guestPickerButtonRef = useRef<HTMLButtonElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null!);
 
   const housingTypes: { type: HousingType; label: string; icon: typeof Home }[] = [
     { type: "apartment", label: "Квартира", icon: Building2 },
@@ -441,6 +563,56 @@ export default function Hero() {
     setError(null);
   };
 
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    setIsLoadingSuggestions(true);
+    try {
+      const response = await fetch(`/api/cities?query=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch suggestions');
+      }
+      const data = await response.json();
+      if (data.status === "ok" && data.results?.locations) {
+        setSuggestions(data.results.locations);
+      } else {
+        setSuggestions([]);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      setSuggestions([]);
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  }, []);
+
+  // Debounce the search function
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchParams.location) {
+        fetchSuggestions(searchParams.location);
+      } else {
+        setSuggestions([]);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchParams.location, fetchSuggestions]);
+
+  const handleSuggestionSelect = (suggestion: CitySuggestion) => {
+    setSearchParams(prev => ({
+      ...prev,
+      location: suggestion.fullName,
+      selectedCityId: suggestion.id
+    }));
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setError(null);
+  };
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -476,7 +648,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className={styles.searchContainer}>
+        <div className={styles.searchContainer} ref={searchContainerRef}>
           <div className={styles.searchTabs} role="tablist">
             <button
               role="tab"
@@ -512,6 +684,7 @@ export default function Hero() {
               <div className={styles.searchInputWrapper}>
                 <MapPin className={styles.searchInputIcon} aria-hidden="true" />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   placeholder={`Введите ${activeTab === "housing" ? "город или район" : "название района"}`}
                   className={`${styles.searchInput} ${error ? styles.searchInputError : ""}`}
@@ -519,15 +692,35 @@ export default function Hero() {
                   onChange={(e) => {
                     setSearchParams(prev => ({ ...prev, location: e.target.value }));
                     setError(null);
+                    setShowSuggestions(true);
                   }}
+                  onFocus={() => setShowSuggestions(true)}
                   aria-invalid={!!error}
                   aria-describedby={error ? "search-error" : undefined}
                   disabled={isLoading}
+                  role="combobox"
+                  aria-expanded={showSuggestions}
+                  aria-controls="suggestions-dropdown"
+                  aria-autocomplete="list"
                 />
+                {isLoadingSuggestions && (
+                  <div className={styles.suggestionsLoading} aria-hidden="true">
+                    <span className={styles.suggestionsSpinner} />
+                  </div>
+                )}
                 {error && (
                   <div id="search-error" className={styles.searchError} role="alert">
                     {error}
                   </div>
+                )}
+                {showSuggestions && (
+                  <SuggestionsPortal
+                    isOpen={showSuggestions}
+                    onClose={() => setShowSuggestions(false)}
+                    suggestions={suggestions}
+                    onSelect={handleSuggestionSelect}
+                    buttonRef={searchInputRef}
+                  />
                 )}
               </div>
 

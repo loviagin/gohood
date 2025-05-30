@@ -3,18 +3,50 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
-import { FaUser, FaSignOutAlt, FaCog, FaBars, FaTimes } from 'react-icons/fa';
+import { usePathname, useRouter } from 'next/navigation';
+import { FaUser, FaSignOutAlt, FaCog, FaBars, FaTimes, FaBuilding } from 'react-icons/fa';
+import { TbSwitch3 } from "react-icons/tb";
 import styles from './Header.module.css';
 
 export default function Header() {
-    const { data: session } = useSession();
+    const { data: session, update: updateSession } = useSession();
+    const router = useRouter();
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const handleSignOut = async () => {
         await signOut({ callbackUrl: '/' });
+    };
+
+    const handleRoleSwitch = async () => {
+        try {
+            const newRole = session?.user?.role === 'landlord' ? 'tenant' : 'landlord';
+            const response = await fetch('/api/auth/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: session?.user?.name,
+                    role: newRole,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update role');
+            }
+
+            // Update the session with new role
+            await updateSession();
+
+            // Close dropdown and redirect to dashboard
+            setIsDropdownOpen(false);
+            router.push('/account');
+        } catch (error) {
+            console.error('Error switching role:', error);
+            // You might want to show an error message to the user here
+        }
     };
 
     const toggleDropdown = () => {
@@ -71,18 +103,18 @@ export default function Header() {
         <>
             {session?.user?.role === 'landlord' ? (
                 <>
-                    {/* <Link 
-                        href="/become-landlord/dashboard" 
-                        className={`${styles.navLink} ${pathname === '/become-landlord/dashboard' ? styles.active : ''}`}
-                    >
-                        Панель управления
-                    </Link>
-                    <Link 
-                        href="/become-landlord/listings" 
-                        className={`${styles.navLink} ${pathname === '/become-landlord/listings' ? styles.active : ''}`}
+                    <Link
+                        href="/account/listings"
+                        className={`${styles.navLink} ${pathname === '/account/listings' ? styles.active : ''}`}
                     >
                         Мои объекты
-                    </Link> */}
+                    </Link>
+                    <Link
+                        href="/account/bookings"
+                        className={`${styles.navLink} ${pathname === '/account/bookings' ? styles.active : ''}`}
+                    >
+                        Бронирования
+                    </Link>
                 </>
             ) : session?.user?.role === 'tenant' ? (
                 <>
@@ -149,21 +181,38 @@ export default function Header() {
                                         <span className={styles.userEmail}>{session.user?.email}</span>
                                     </div>
 
-                                    <div className={styles.dropdownDivider} />
-
-                                    {session.user?.role === 'landlord' && (
+                                    {session.user?.role === 'landlord' ? (
                                         <>
-                                            {/* <Link
-                                                href="/account/dashboard"
+                                            <button
+                                                onClick={handleRoleSwitch}
                                                 className={styles.dropdownItem}
-                                                onClick={() => setIsDropdownOpen(false)}
                                             >
-                                                <FaBuilding className={styles.dropdownIcon} />
-                                                Панель управления
-                                            </Link> */}
+                                                <TbSwitch3 className={styles.dropdownIcon} />
+                                                В профиль арендатора
+                                            </button>
+                                            <div className={styles.dropdownDivider} />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={handleRoleSwitch}
+                                                className={styles.dropdownItem}
+                                            >
+                                                <TbSwitch3 className={styles.dropdownIcon} />
+                                                В профиль арендодателя
+                                            </button>
                                             <div className={styles.dropdownDivider} />
                                         </>
                                     )}
+
+                                    <Link
+                                        href="/account"
+                                        className={styles.dropdownItem}
+                                        onClick={() => setIsDropdownOpen(false)}
+                                    >
+                                        <FaBuilding className={styles.dropdownIcon} />
+                                        Панель управления
+                                    </Link>
 
                                     <Link
                                         href="/account/settings"
@@ -189,7 +238,7 @@ export default function Header() {
                             <Link href="/signin" className={`${styles.authButton} ${styles.desktopAuthButton}`}>
                                 Войти
                             </Link>
-                            <button 
+                            <button
                                 type="button"
                                 className={styles.mobileMenuButton}
                                 onClick={(e) => {
@@ -209,15 +258,15 @@ export default function Header() {
             </div>
 
             {/* Мобильное меню */}
-            <div 
+            <div
                 className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
                 style={{ display: isMobileMenuOpen ? 'block' : 'none' }}
             >
                 <nav className={styles.mobileNav}>
                     {renderNavLinks()}
                     {!session?.user?.profileCompleted && (
-                        <Link 
-                            href="/signin" 
+                        <Link
+                            href="/signin"
                             className={styles.mobileAuthButton}
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
@@ -226,10 +275,10 @@ export default function Header() {
                     )}
                 </nav>
             </div>
-            
+
             {/* Оверлей для затемнения фона */}
             {isMobileMenuOpen && (
-                <div 
+                <div
                     className={styles.mobileMenuOverlay}
                     onClick={() => {
                         console.log('Overlay clicked');

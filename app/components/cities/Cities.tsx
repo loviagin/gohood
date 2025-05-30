@@ -2,12 +2,12 @@ import styles from "./Cities.module.css";
 import Link from "next/link";
 
 const cities = [
-  { name: "Москва", image: "/images/moscow.jpg" },
-  { name: "Лондон", image: "/images/london.jpg" },
-  { name: "Рим", image: "/images/rome.jpg" },
-  { name: "Милан", image: "/images/milan.jpg" },
-  { name: "Казань", image: "/images/kazan.jpg" },
-  { name: "Ярославль", image: "/images/yaroslavl.jpg" },
+  { name: "Москва", image: "/cities/moscow.webp" },
+  { name: "Лондон", image: "/cities/london.webp" },
+  { name: "Рим", image: "/cities/rome.webp" },
+  { name: "Милан", image: "/cities/milan.webp" },
+  { name: "Казань", image: "/cities/kazan.webp" },
+  { name: "Ярославль", image: "/cities/yaroslavl.webp" },
 ];
 
 export default function Cities() {
@@ -33,9 +33,9 @@ export default function Cities() {
           ))}
         </div>
         <div className={styles.buttonContainer}>
-          <Link href="/cities" className={styles.allCitiesButton}>
+          {/* <Link href="/cities" className={styles.allCitiesButton}>
             Все города
-          </Link>
+          </Link> */}
         </div>
       </div>
     </section>

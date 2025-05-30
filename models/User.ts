@@ -6,11 +6,14 @@ export interface IUser extends Document {
   passwordHash?: string;
   role: 'user' | 'admin' | 'tenant' | 'landlord';
   phone?: string;
+  avatar?: string;
   favorites: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
   companyName?: string;
   profileCompleted: boolean;
+  verifiedTenant: boolean;
+  verifiedLandlord: boolean;
   googleId?: string;
   yandexId?: string;
   vkId?: string;
@@ -38,13 +41,16 @@ const UserSchema = new Schema<IUser>(
     },
     role: { type: String, enum: ['user', 'admin', 'tenant', 'landlord'], default: 'user' },
     phone: { type: String, required: false },
+    avatar: { type: String, required: false },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing' }],
     companyName: String,
     profileCompleted: { type: Boolean, default: false },
     googleId: String,
     yandexId: String,
     vkId: String,
-    appleId: String
+    appleId: String,
+    verifiedTenant: { type: Boolean, default: false },
+    verifiedLandlord: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

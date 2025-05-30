@@ -16,14 +16,6 @@ export async function POST(req: Request) {
 
         const { name, phone, companyName, role } = await req.json();
 
-        // Validate input
-        if (!name || !phone) {
-            return NextResponse.json(
-                { error: 'Name and phone are required' },
-                { status: 400 }
-            );
-        }
-
         // Ensure MongoDB connection
         await connectDB();
 
