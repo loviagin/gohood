@@ -15,6 +15,7 @@ interface CitySuggestion {
   countryName: string;
   countryCode: string;
   id: string;
+  hotelsCount: string;
   location: {
     lat: string;
     lon: string;
@@ -463,8 +464,13 @@ const SuggestionsPortal = ({
             type="button"
             role="option"
           >
-            <div className={styles.suggestionCity}>{suggestion.cityName}</div>
-            <div className={styles.suggestionCountry}>{suggestion.countryName}</div>
+            <div className={styles.suggestionMain}>
+              <div className={styles.suggestionCity}>{suggestion.cityName}</div>
+              <div className={styles.suggestionCountry}>{suggestion.countryName}</div>
+            </div>
+            <div className={styles.suggestionHotels}>
+              {suggestion.hotelsCount} отелей
+            </div>
           </button>
         ))}
       </div>

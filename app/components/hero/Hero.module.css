@@ -211,18 +211,23 @@
   margin-top: 4px;
   max-height: 300px;
   overflow-y: auto;
+  min-width: 320px;
+  width: max-content;
+  max-width: 480px;
 }
 
 .suggestionItem {
   display: flex;
-  flex-direction: column;
-  padding: 12px 16px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
   width: 100%;
   text-align: left;
   border: none;
   background: none;
   cursor: pointer;
   transition: background-color 0.2s;
+  gap: 1.5rem;
 }
 
 .suggestionItem:hover,
@@ -231,14 +236,37 @@
   outline: none;
 }
 
+.suggestionMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 0;
+}
+
 .suggestionCity {
   font-weight: 500;
   color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9375rem;
 }
 
 .suggestionCountry {
   font-size: 0.875rem;
   color: #64748b;
+}
+
+.suggestionHotels {
+  font-size: 0.875rem;
+  color: #2563eb;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-left: 1rem;
+  border-left: 1px solid #e2e8f0;
+  min-width: 90px;
+  text-align: right;
 }
 
 .suggestionsLoading {
@@ -976,6 +1004,35 @@
 
   .searchInputWrapper {
     z-index: 9999;
+  }
+
+  .suggestionsDropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 360px;
+    margin: 0;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .suggestionItem {
+    padding: 16px 20px;
+  }
+
+  .suggestionCity {
+    font-size: 1rem;
+  }
+
+  .suggestionCountry {
+    font-size: 0.9375rem;
+  }
+
+  .suggestionHotels {
+    font-size: 0.9375rem;
+    min-width: 100px;
   }
 }
 
