@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
-import { FaApple } from 'react-icons/fa';
+import { FaApple, FaYandex } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
@@ -56,6 +56,10 @@ export default function SignIn() {
 
     const handleAppleSignIn = () => {
         signIn('apple', { callbackUrl: '/' });
+    };
+
+    const handleYandexSignIn = () => {
+        signIn('yandex', { callbackUrl: '/' });
     };
 
     const handleTenantRegistration = () => {
@@ -136,6 +140,13 @@ export default function SignIn() {
                     >
                         <FaApple className={styles.socialIcon} />
                         Войти через Apple
+                    </button>
+                    <button
+                        onClick={handleYandexSignIn}
+                        className={styles.yandexButton}
+                    >
+                        <FaYandex className={styles.socialIcon} />
+                        Войти через Yandex
                     </button>
                 </div>
 

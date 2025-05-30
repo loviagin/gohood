@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FcGoogle } from 'react-icons/fc';
 import { FaApple } from 'react-icons/fa';
 import { FaYandex } from 'react-icons/fa';
-import { FaVk } from 'react-icons/fa';
+// import { FaVk } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import styles from './page.module.css';
 
@@ -396,13 +396,13 @@ function RegistrationForm() {
                             Войти через Яндекс
                         </button>
 
-                        <button
+                        {/* <button
                             onClick={() => handleSocialSignIn('vk')}
                             className={styles.vkButton}
                         >
                             <FaVk className={styles.socialIcon} />
                             Войти через ВКонтакте
-                        </button>
+                        </button> */}
                     </div>
 
                     <div className={styles.loginLink}>
