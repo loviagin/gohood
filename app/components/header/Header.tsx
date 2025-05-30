@@ -84,6 +84,21 @@ export default function Header() {
                         Мои объекты
                     </Link> */}
                 </>
+            ) : session?.user?.role === 'tenant' ? (
+                <>
+                    <Link
+                        href="/my-rentals"
+                        className={`${styles.navLink} ${pathname === '/my-rentals' ? styles.active : ''}`}
+                    >
+                        Мои аренды
+                    </Link>
+                    <Link
+                        href="/rent"
+                        className={`${styles.navLink} ${pathname === '/rent' ? styles.active : ''}`}
+                    >
+                        Снять жилье
+                    </Link>
+                </>
             ) : (
                 <>
                     <Link

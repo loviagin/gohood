@@ -23,14 +23,14 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: false },
     passwordHash: {
       type: String,
-      required: function(this: IUser) {
-        return !(this.googleId || this.yandexId || this.vkId || this.appleId);
-      },
+      required: false,
       validate: {
         validator: function(this: IUser, value: string) {
+          // If any social login ID is present, password is not required
           if (this.googleId || this.yandexId || this.vkId || this.appleId) {
             return true;
           }
+          // For non-social login, password is required
           return value !== undefined && value !== null && value !== '';
         },
         message: 'Password is required for non-social login users'
