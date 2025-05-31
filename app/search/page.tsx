@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { MapPin, Search, Home, Building2, House, Building, Users, Calendar as CalendarIcon, Star } from "lucide-react";
 import styles from "./page.module.css";
 import { format } from "date-fns";
@@ -9,7 +9,9 @@ import { ru } from "date-fns/locale";
 import { searchHotels, type HotelResult } from "../services/hotellook";
 import CityHero from "./components/search/CityHero";
 
-export default function SearchPage() {
+export const dynamic = "force-dynamic";
+
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const [results, setResults] = useState<HotelResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -170,5 +172,13 @@ export default function SearchPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Загрузка...</div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }

@@ -77,8 +77,7 @@ export async function POST(
     const updatedCity = await City.findOneAndUpdate(
       { 
         $or: [
-          { name: cityName },
-          { fullName: cityName }
+          { _id: cityName }
         ]
       },
       { 
