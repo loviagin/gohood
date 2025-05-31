@@ -136,15 +136,11 @@
   max-width: 1000px;
   width: 100%;
   margin: 0 auto;
-  background: linear-gradient(to bottom, #ffffff, #f8fafc);
-  backdrop-filter: blur(8px);
+  background: #ffffff;
   padding: 2rem;
   border-radius: 1rem;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 2px 4px -1px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
@@ -795,8 +791,9 @@
   .hero {
     padding: 1.5rem 1rem;
     min-height: auto;
-    padding-top: calc(4rem + 2rem); /* header height + padding */
+    padding-top: calc(4rem + 2rem);
     padding-bottom: 3rem;
+    background: #ffffff;
   }
   
   .heroContent {
@@ -841,15 +838,11 @@
   }
   
   .searchContainer {
-    padding: 1.25rem 1rem;
-    margin: 0 -0.5rem;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    box-shadow: 
-      0 1px 0 rgba(255, 255, 255, 0.8),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    padding: 1.5rem 1rem;
+    margin: 0;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   
   .searchInputsGrid {
@@ -858,11 +851,14 @@
   }
   
   .searchInputsGrid[data-tab="districts"] {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   
   .searchInputsGrid[data-tab="districts"] .searchButton {
-    min-width: 140px;
+    width: 100%;
+    min-width: 0;
+    height: 3rem;
   }
   
   .searchInputsGrid[data-tab="districts"] .searchInput {
@@ -881,25 +877,27 @@
   .searchInput,
   .datePickerButton,
   .guestPickerButton {
-    padding: 0 1rem 0 2.75rem;
-    font-size: 0.875rem;
-    border-radius: 0.625rem;
-    -webkit-tap-highlight-color: transparent;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
   
-  .searchInputIcon,
-  .datePickerIcon,
-  .guestPickerIcon {
-    width: 18px;
-    height: 18px;
-    left: 1rem;
+  .searchInput:focus,
+  .datePickerButton:focus,
+  .guestPickerButton:focus {
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   }
   
   .searchButton {
-    padding: 0.75rem 1.25rem;
-    font-size: 0.875rem;
-    border-radius: 0.625rem;
-    margin-top: 0.5rem;
+    background: #2563eb;
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+  }
+  
+  .searchButton:hover {
+    background: #1d4ed8;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
   }
   
   .searchTags {
@@ -1100,6 +1098,7 @@
   .hero {
     padding-top: calc(4rem + 1.5rem);
     padding-bottom: 2.5rem;
+    background: #ffffff;
   }
 
   .title {
@@ -1116,8 +1115,9 @@
   }
 
   .searchContainer {
-    padding: 1rem 0.75rem;
-    background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    padding: 1.25rem 1rem;
+    margin: 0 0.5rem;
+    border-radius: 1rem;
   }
 
   .searchTabs {
@@ -1165,30 +1165,20 @@
     height: 14px;
   }
 
-  .searchContainer {
-    padding: 1rem 0.75rem;
-  }
-
-  .searchInputWrapper,
-  .datePickerWrapper,
-  .guestPickerWrapper {
-    height: 2.75rem;
-  }
-
   .searchInput,
   .datePickerButton,
   .guestPickerButton {
-    height: 2.75rem;
-    font-size: 0.9375rem;
-    padding: 0 0.875rem 0 2.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
-  .searchInputIcon,
-  .datePickerIcon,
-  .guestPickerIcon {
-    width: 16px;
-    height: 16px;
-    left: 0.875rem;
+  .searchInput:focus,
+  .datePickerButton:focus,
+  .guestPickerButton:focus {
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   }
 
   .searchButton {
@@ -1220,7 +1210,8 @@
   }
 
   .searchInputsGrid[data-tab="districts"] .searchButton {
-    min-width: 120px;
+    height: 2.75rem;
+    font-size: 0.9375rem;
   }
 }
 
