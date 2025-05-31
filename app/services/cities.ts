@@ -46,14 +46,14 @@ async function generateCityInfo(cityName: string): Promise<CityInfo> {
     }
   });
 
-  const prompt = `Ты - API, который возвращает информацию о городах. Верни ТОЛЬКО JSON объект без каких-либо дополнительных символов, комментариев или форматирования. Вот структура JSON для города ${cityName}:
+  const prompt = `Ты - API, который возвращает информацию о городах. Верни ТОЛЬКО JSON объект без каких-либо дополнительных символов, комментариев или форматирования. Для поля imageUrl используй прямую ссылку на изображение города с Pexels или Unsplash, обязательно включая расширение файла (например, https://images.pexels.com/photos/.../photo.jpg или https://images.unsplash.com/photo-.../photo.jpg). Вот структура JSON для города ${cityName}:
   {
     "name": "название города",
     "fullName": "полное название города с указанием страны",
     "country": "название страны",
     "countryCode": "код страны (например, RU)",
     "description": "краткое описание города (2-3 предложения)",
-    "imageUrl": "URL фотографии города (используй Unsplash API)",
+    "imageUrl": "прямая ссылка на изображение города с Pexels или Unsplash (обязательно с расширением файла)",
     "details": {
       "population": численность населения,
       "language": "основной язык",
@@ -93,20 +93,6 @@ async function generateCityInfo(cityName: string): Promise<CityInfo> {
       const cityInfo = JSON.parse(cleanJson) as CityInfo;
       console.log('Successfully parsed city info');
 
-      // Получаем изображение города через Unsplash API
-      const unsplashResponse = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(cityName)} city&per_page=1`,
-        {
-          headers: {
-            'Authorization': `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`,
-          },
-        }
-      );
-      const unsplashData = await unsplashResponse.json();
-      if (unsplashData.results?.[0]?.urls?.regular) {
-        cityInfo.imageUrl = unsplashData.results[0].urls.regular;
-      }
-
       return cityInfo;
     } catch (parseError) {
       console.error('JSON parse error:', {
@@ -135,12 +121,21 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
     await connectDB();
     console.log('Connected to database');
 
-    // Ищем город в базе данных
-    let city = await City.findOne({ name: cityName });
+    // Ищем город в базе данных по имени или полному имени
+    let city = await City.findOne({
+      $or: [
+        { name: cityName },
+        { fullName: cityName }
+      ]
+    });
     console.log('City found in database:', city ? 'yes' : 'no');
 
     // Если город не найден или информация устарела (старше 30 дней)
-    if (!city || (Date.now() - city.lastUpdated.getTime()) > 30 * 24 * 60 * 60 * 1000) {
+    const needsUpdate = !city || 
+      !city.lastUpdated || 
+      (Date.now() - new Date(city.lastUpdated).getTime()) > 30 * 24 * 60 * 60 * 1000;
+
+    if (needsUpdate) {
       console.log('City needs update:', !city ? 'not found' : 'outdated');
       try {
         // Получаем информацию о городе через Gemini
@@ -158,11 +153,33 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
         } else {
           // Создаем новую запись
           console.log('Creating new city record');
-          city = await City.create({
-            ...cityInfo,
-            lastUpdated: new Date(),
-          });
-          console.log('New city record created');
+          try {
+            city = await City.create({
+              ...cityInfo,
+              lastUpdated: new Date(),
+            });
+            console.log('New city record created');
+          } catch (createError: any) {
+            // Если возникла ошибка дублирования, пробуем найти существующую запись
+            if (createError.code === 11000) {
+              console.log('Duplicate key error, trying to find existing record');
+              city = await City.findOne({
+                $or: [
+                  { name: cityInfo.name },
+                  { fullName: cityInfo.fullName }
+                ]
+              });
+              if (city) {
+                // Обновляем существующую запись
+                Object.assign(city, cityInfo);
+                city.lastUpdated = new Date();
+                await city.save();
+                console.log('Updated existing city record after duplicate error');
+              }
+            } else {
+              throw createError;
+            }
+          }
         }
       } catch (error) {
         console.error('Error updating city info:', {

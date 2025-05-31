@@ -13,17 +13,27 @@ export default function CityHero({ cityName }: CityHeroProps) {
   const [cityInfo, setCityInfo] = useState<CityDocument | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Функция для получения проксированного URL изображения
+  const getProxiedImageUrl = (url: string) => {
+    return `/api/cities/${encodeURIComponent(cityName)}/image?url=${encodeURIComponent(url)}`;
+  };
 
   useEffect(() => {
     const fetchCityInfo = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        setImageError(false);
+        setImageLoaded(false);
         const response = await fetch(`/api/cities/${encodeURIComponent(cityName)}`);
         if (!response.ok) {
           throw new Error('Failed to fetch city information');
         }
         const data = await response.json();
+        console.log('City image URL:', data.imageUrl);
         setCityInfo(data);
       } catch (err) {
         console.error('Error fetching city info:', err);
@@ -60,8 +70,27 @@ export default function CityHero({ cityName }: CityHeroProps) {
   return (
     <div 
       className={styles.hero}
-      style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${cityInfo.imageUrl})` }}
+      style={{ 
+        backgroundImage: cityInfo?.imageUrl && !imageError 
+          ? `url(${getProxiedImageUrl(cityInfo.imageUrl)})`
+          : undefined
+      }}
     >
+      {cityInfo?.imageUrl && (
+        <img 
+          src={getProxiedImageUrl(cityInfo.imageUrl)}
+          alt="" 
+          style={{ display: 'none' }}
+          onError={(e) => {
+            console.error('Failed to load city image:', cityInfo.imageUrl);
+            setImageError(true);
+          }}
+          onLoad={(e) => {
+            console.log('City image loaded successfully:', cityInfo.imageUrl);
+            setImageLoaded(true);
+          }}
+        />
+      )}
       <div className={styles.content}>
         <h1 className={styles.title}>{cityInfo.fullName}</h1>
         <p className={styles.description}>{cityInfo.description}</p>
