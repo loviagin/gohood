@@ -411,6 +411,13 @@ function RegistrationForm() {
                             Войти
                         </a>
                     </div>
+
+                    <div className={styles.consentText}>
+                        Регистрируясь, вы принимаете{' '}
+                        <a href="/terms" className={styles.consentLink} target="_blank" rel="noopener noreferrer">
+                            Пользовательское соглашение
+                        </a>
+                    </div>
                 </div>
             </div>
         );

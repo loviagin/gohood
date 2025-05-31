@@ -5,6 +5,7 @@ import Script from "next/script";
 import "./globals.css";
 import Header from "./components/header/Header";
 import { Providers } from "./providers";
+import Footer from "./components/footer/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,9 +22,6 @@ export const metadata: Metadata = {
   description:
     "Отели, квартиры, дома, коттеджи, хостелы, апартаменты и другие варианты жилья в России и за рубежом с ИИ подбором районов",
   keywords: ["GoHood", "Умный поиск жилья", "Подбор районов", "Отели", "Квартиры", "Котеджи", "Хостелы", "Апартаменты"],
-  icons: {
-    icon: "/favicon.ico",
-  },
   openGraph: {
     title: "GoHood – Умный поиск жилья с подбором районов",
     description:
@@ -91,6 +89,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           {children}
+          <Footer />
           <Toaster position="top-center" />
         </Providers>
       </body>

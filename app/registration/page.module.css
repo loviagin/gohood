@@ -504,4 +504,23 @@
     font-size: 0.875rem;
     color: #6b7280;
     text-align: center;
+}
+
+.consentText {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #666;
+  text-align: center;
+}
+
+.consentLink {
+  color: #0066cc;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.consentLink:hover {
+  color: #004499;
+  text-decoration: underline;
 } 
