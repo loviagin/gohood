@@ -5,9 +5,9 @@ import { createPortal } from "react-dom";
 import styles from "./Hero.module.css";
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths, subDays } from "date-fns";
 import { ru } from "date-fns/locale";
+import { useRouter } from "next/navigation";
 
 type SearchTab = "housing" | "districts";
-type HousingType = "apartment" | "house" | "room" | "hostel";
 
 interface CitySuggestion {
   cityName: string;
@@ -27,7 +27,6 @@ interface SearchParams {
   checkIn: Date;
   checkOut: Date | null;
   guests: number;
-  housingTypes: HousingType[];
   selectedCityId?: string;
 }
 
@@ -487,7 +486,6 @@ export default function Hero() {
     checkIn: new Date(),
     checkOut: null,
     guests: 1,
-    housingTypes: [],
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -501,22 +499,7 @@ export default function Hero() {
   const datePickerButtonRef = useRef<HTMLButtonElement | null>(null);
   const guestPickerButtonRef = useRef<HTMLButtonElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null!);
-
-  const housingTypes: { type: HousingType; label: string; icon: typeof Home }[] = [
-    { type: "apartment", label: "Квартира", icon: Building2 },
-    { type: "house", label: "Дом", icon: House },
-    { type: "room", label: "Номер", icon: ConciergeBell },
-    { type: "hostel", label: "Хостел", icon: Building },
-  ];
-
-  const handleHousingTypeClick = (type: HousingType) => {
-    setSearchParams(prev => ({
-      ...prev,
-      housingTypes: prev.housingTypes.includes(type)
-        ? prev.housingTypes.filter(t => t !== type)
-        : [...prev.housingTypes, type]
-    }));
-  };
+  const router = useRouter();
 
   const handleGuestChange = (change: number) => {
     setSearchParams(prev => ({
@@ -545,7 +528,12 @@ export default function Hero() {
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     if (!searchParams.location.trim()) {
-      setError("Пожалуйста, введите город или район");
+      setError("Пожалуйста, введите город");
+      return;
+    }
+
+    if (!searchParams.checkOut) {
+      setError("Пожалуйста, выберите дату выезда");
       return;
     }
 
@@ -553,10 +541,18 @@ export default function Hero() {
     setError(null);
 
     try {
-      // TODO: Implement actual search logic
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
-      console.log('Search params:', searchParams);
+      // Формируем URL с параметрами поиска
+      const queryParams = new URLSearchParams({
+        location: searchParams.location,
+        checkIn: format(searchParams.checkIn, 'yyyy-MM-dd'),
+        checkOut: format(searchParams.checkOut, 'yyyy-MM-dd'),
+        guests: searchParams.guests.toString(),
+      });
+
+      // Перенаправляем на страницу поиска
+      router.push(`/search?${queryParams.toString()}`);
     } catch (err) {
+      console.error('Search error:', err);
       setError("Произошла ошибка при поиске. Пожалуйста, попробуйте снова.");
     } finally {
       setIsLoading(false);
@@ -692,7 +688,7 @@ export default function Hero() {
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder={`Введите ${activeTab === "housing" ? "город или район" : "название района"}`}
+                  placeholder="Введите город"
                   className={`${styles.searchInput} ${error ? styles.searchInputError : ""}`}
                   value={searchParams.location}
                   onChange={(e) => {
@@ -737,10 +733,7 @@ export default function Hero() {
                       ref={datePickerButtonRef}
                       type="button"
                       className={styles.datePickerButton}
-                      onClick={() => {
-                        // Убираем сброс конечной даты при открытии календаря
-                        setIsDatePickerOpen(!isDatePickerOpen);
-                      }}
+                      onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
                       aria-expanded={isDatePickerOpen}
                     >
                       <CalendarIcon className={styles.datePickerIcon} aria-hidden="true" />
@@ -754,9 +747,7 @@ export default function Hero() {
                     </button>
                     <DatePickerPortal
                       isOpen={isDatePickerOpen}
-                      onClose={() => {
-                        setIsDatePickerOpen(false);
-                      }}
+                      onClose={() => setIsDatePickerOpen(false)}
                       selectedDates={{
                         start: searchParams.checkIn,
                         end: searchParams.checkOut
@@ -807,30 +798,12 @@ export default function Hero() {
                 ) : (
                   <span className={styles.searchButtonContent}>
                     <Search className={styles.searchButtonIcon} aria-hidden="true" />
-                    Найти идеальное место
+                    Найти отель
                   </span>
                 )}
               </button>
             </div>
           </form>
-
-          {activeTab === "housing" && (
-            <div className={styles.searchTags} role="list" aria-label="Типы жилья">
-              {housingTypes.map(({ type, label, icon: Icon }) => (
-                <button
-                  key={type}
-                  className={`${styles.searchTag} ${searchParams.housingTypes.includes(type) ? styles.searchTagSelected : ""}`}
-                  onClick={() => handleHousingTypeClick(type)}
-                  type="button"
-                  role="listitem"
-                  aria-pressed={searchParams.housingTypes.includes(type)}
-                >
-                  <Icon className={styles.searchTagIcon} aria-hidden="true" />
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </section>

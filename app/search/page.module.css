@@ -1,0 +1,502 @@
+.main {
+  padding: clamp(4rem, 8vw, 8rem) clamp(1rem, 3vw, 2rem);
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(79, 70, 229, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  padding: 0 clamp(0.5rem, 2vw, 1rem);
+}
+
+.searchSummary {
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: 800;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  background: linear-gradient(135deg, #1e40af, #4f46e5, #2563eb, #1e40af);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 8s ease infinite;
+}
+
+.searchParams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  max-width: fit-content;
+  margin: 0 auto;
+}
+
+.searchParam {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.paramIcon {
+  width: 18px;
+  height: 18px;
+  color: #64748b;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 0;
+  color: #64748b;
+  font-size: 1.125rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.error {
+  text-align: center;
+  padding: 3rem 0;
+  color: #ef4444;
+  font-size: 1.125rem;
+}
+
+.noResults {
+  text-align: center;
+  padding: 3rem 0;
+  color: #64748b;
+}
+
+.noResults p {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.noResultsSubtext {
+  font-size: 1rem !important;
+  color: #94a3b8;
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+  perspective: 1000px;
+}
+
+.resultCard {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.resultCard:hover {
+  transform: translateY(-4px) translateZ(0);
+  box-shadow: 
+    0 12px 20px rgba(0, 0, 0, 0.08),
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.resultImage {
+  position: relative;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+}
+
+.resultImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.resultCard:hover .resultImage img {
+  transform: scale(1.05);
+}
+
+.resultType {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.resultIcon {
+  width: 16px;
+  height: 16px;
+  color: #2563eb;
+}
+
+.resultContent {
+  padding: 1.25rem;
+}
+
+.resultTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.resultLocation {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9375rem;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+}
+
+.locationIcon {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.resultDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.resultDetails span:nth-child(2) {
+  color: #cbd5e1;
+}
+
+.resultFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.resultRating {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.ratingValue {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.ratingLabel {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.resultPrice {
+  text-align: right;
+}
+
+.priceValue {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 1.125rem;
+}
+
+.pricePeriod {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.starsContainer {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.starIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.starFilled {
+  color: #f59e0b;
+  fill: #f59e0b;
+}
+
+.starEmpty {
+  color: #e2e8f0;
+  fill: #e2e8f0;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tablet styles */
+@media (max-width: 1024px) {
+  .main {
+    padding-top: clamp(3.5rem, 7vw, 7rem);
+  }
+
+  .container {
+    max-width: 90%;
+  }
+
+  .resultsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+  }
+
+  .resultCard {
+    border-radius: 0.875rem;
+  }
+
+  .resultContent {
+    padding: 1rem;
+  }
+
+  .resultTitle {
+    font-size: 1rem;
+  }
+
+  .resultLocation {
+    font-size: 0.875rem;
+  }
+
+  .resultDetails {
+    font-size: 0.8125rem;
+  }
+
+  .priceValue {
+    font-size: 1rem;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .main {
+    padding: clamp(4rem, 6vw, 6rem) 1rem;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+
+  .searchParams {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .searchParam {
+    justify-content: center;
+    padding: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .resultsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .resultCard {
+    border-radius: 0.75rem;
+  }
+
+  .resultType {
+    top: 0.75rem;
+    left: 0.75rem;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+
+  .resultIcon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .resultContent {
+    padding: 0.875rem;
+  }
+
+  .resultTitle {
+    font-size: 0.9375rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .resultLocation {
+    font-size: 0.8125rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .locationIcon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .resultDetails {
+    font-size: 0.75rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .resultFooter {
+    padding-top: 0.875rem;
+  }
+
+  .ratingValue {
+    font-size: 0.9375rem;
+  }
+
+  .ratingLabel {
+    font-size: 0.8125rem;
+  }
+
+  .priceValue {
+    font-size: 0.9375rem;
+  }
+
+  .pricePeriod {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Small mobile styles */
+@media (max-width: 480px) {
+  .main {
+    padding-top: clamp(3.5rem, 5vw, 5rem);
+  }
+
+  .title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+  }
+
+  .searchParams {
+    padding: 0.625rem;
+    gap: 0.625rem;
+  }
+
+  .searchParam {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+
+  .paramIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .resultType {
+    top: 0.625rem;
+    left: 0.625rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .resultIcon {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 480px) and (orientation: landscape) {
+  .main {
+    padding-top: clamp(3rem, 5vw, 4rem);
+  }
+
+  .searchParams {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .searchParam {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .resultsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    gap: 0.75rem;
+  }
+} 

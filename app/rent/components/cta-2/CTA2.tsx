@@ -10,7 +10,7 @@ export function CTA2() {
       <div className={styles.container}>
         <div className={styles.content}>
           <h2 className={styles.title}>
-            Забудь о сложностях с поиском жилья — попробуй GoHood прямо сейчас!
+            Забудьте о сложностях с поиском жилья — попробуйте GoHood прямо сейчас!
           </h2>
           <Link href="/cities" className={styles.button}>
             Начать поиск
