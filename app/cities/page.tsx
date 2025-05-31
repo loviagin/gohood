@@ -258,7 +258,7 @@ export default function CitiesPage() {
 
         <div className={styles.grid}>
           {cities.map((city) => (
-            <Link href={`/cities/${city.name.toLowerCase()}`} key={city.name} className={styles.card}>
+            <Link href={`/cities`} key={city.name} className={styles.card}>
               <img
                 src={city.image}
                 alt={city.name}

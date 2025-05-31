@@ -11,6 +11,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/become-landlord',
     '/rent',
     '/account',
+    '/contacts',
+    '/cities',
+    '/terms',
+    '/privacy',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
