@@ -130,75 +130,26 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
     });
     console.log('City found in database:', city ? 'yes' : 'no');
 
-    // Если город не найден или информация устарела (старше 30 дней)
-    const needsUpdate = !city || 
-      !city.lastUpdated || 
-      (Date.now() - new Date(city.lastUpdated).getTime()) > 30 * 24 * 60 * 60 * 1000;
-
-    if (needsUpdate) {
-      console.log('City needs update:', !city ? 'not found' : 'outdated');
-      try {
-        // Получаем информацию о городе через Gemini
-        console.log('Generating city info with Gemini...');
-        const cityInfo = await generateCityInfo(cityName);
-        console.log('City info generated successfully');
-
-        if (city) {
-          // Обновляем существующую запись
-          console.log('Updating existing city record');
-          Object.assign(city, cityInfo);
-          city.lastUpdated = new Date();
-          await city.save();
-          console.log('City record updated');
-        } else {
-          // Создаем новую запись
-          console.log('Creating new city record');
-          try {
-            city = await City.create({
-              ...cityInfo,
-              lastUpdated: new Date(),
-            });
-            console.log('New city record created');
-          } catch (createError: any) {
-            // Если возникла ошибка дублирования, пробуем найти существующую запись
-            if (createError.code === 11000) {
-              console.log('Duplicate key error, trying to find existing record');
-              city = await City.findOne({
-                $or: [
-                  { name: cityInfo.name },
-                  { fullName: cityInfo.fullName }
-                ]
-              });
-              if (city) {
-                // Обновляем существующую запись
-                Object.assign(city, cityInfo);
-                city.lastUpdated = new Date();
-                await city.save();
-                console.log('Updated existing city record after duplicate error');
-              }
-            } else {
-              throw createError;
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error updating city info:', {
-          error,
-          message: error instanceof Error ? error.message : 'Unknown error',
-          stack: error instanceof Error ? error.stack : undefined,
-          cityName
-        });
-        if (!city) {
-          throw new Error('Failed to get city information');
-        }
-      }
+    // Если город найден — просто возвращаем его, ничего не обновляем
+    if (city) {
+      return city;
     }
 
-    if (!city) {
-      throw new Error('City not found and could not be created');
+    // Если город не найден — создаём новую запись через AI
+    try {
+      console.log('Generating city info with Gemini...');
+      const cityInfo = await generateCityInfo(cityName);
+      console.log('City info generated successfully');
+      city = await City.create({
+        ...cityInfo,
+        lastUpdated: new Date(),
+      });
+      console.log('New city record created');
+      return city;
+    } catch (error) {
+      console.error('Error creating city info:', error);
+      throw new Error('Failed to get city information');
     }
-
-    return city;
   } catch (error) {
     console.error('Error in getCityInfo:', {
       error,
