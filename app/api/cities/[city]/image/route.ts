@@ -2,7 +2,7 @@ import { getToken } from 'next-auth/jwt';
 import { NextResponse, type NextRequest } from 'next/server';
 import { City } from '@/models/City';
 import connectDB from '@/lib/db';
-
+import { verifyAuth } from '@/lib/jwt';
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -39,13 +39,10 @@ export async function POST(
 ) {
   try {
     // Проверяем JWT токен
-    // const token = await getToken({ req: request });
-    // if (!token) {
-    //   return NextResponse.json(
-    //     { error: 'Unauthorized' },
-    //     { status: 401 }
-    //   );
-    // }
+    const authResult = await verifyAuth(request);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Returns error response if token is invalid
+    }
 
     // Получаем параметры из запроса
     const { city } = await context.params;

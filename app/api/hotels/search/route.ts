@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  
+
   // Validate required parameters
   const requiredParams = ['location', 'checkIn', 'checkOut', 'guests'];
   const missingParams = requiredParams.filter(param => !searchParams.has(param));
-  
+
   if (missingParams.length > 0) {
     return NextResponse.json(
       { error: `Missing required parameters: ${missingParams.join(', ')}` },
@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       return NextResponse.json(
-        { 
+        {
           error: `Hotellook API error (${response.status})`,
-          details: errorData?.message || response.statusText 
+          details: errorData?.message || response.statusText
         },
         { status: response.status }
       );
