@@ -140,11 +140,29 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
       console.log('Generating city info with Gemini...');
       const cityInfo = await generateCityInfo(cityName);
       console.log('City info generated successfully');
-      city = await City.create({
-        ...cityInfo,
-        lastUpdated: new Date(),
-      });
-      console.log('New city record created');
+      try {
+        city = await City.create({
+          ...cityInfo,
+          lastUpdated: new Date(),
+        });
+        console.log('New city record created');
+      } catch (createError: any) {
+        // Если возникла ошибка дублирования, пробуем найти существующую запись
+        if (createError.code === 11000) {
+          console.log('Duplicate key error, trying to find existing record');
+          city = await City.findOne({
+            $or: [
+              { name: cityInfo.name },
+              { fullName: cityInfo.fullName }
+            ]
+          });
+          if (city) {
+            console.log('Found existing city record after duplicate error');
+            return city;
+          }
+        }
+        throw createError;
+      }
       return city;
     } catch (error) {
       console.error('Error creating city info:', error);

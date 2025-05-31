@@ -46,6 +46,8 @@ export default function CityHero({ cityName }: CityHeroProps) {
     fetchCityInfo();
   }, [cityName]);
 
+  const imageUrl = imageError ? "/placeholder.webp" : cityInfo?.imageUrl;
+
   if (isLoading) {
     return (
       <div className={styles.hero}>
@@ -68,27 +70,22 @@ export default function CityHero({ cityName }: CityHeroProps) {
   }
 
   return (
-    <div 
+    <div
       className={styles.hero}
-      style={{ 
-        backgroundImage: cityInfo?.imageUrl && !imageError 
-          ? `url(${getProxiedImageUrl(cityInfo.imageUrl)})`
-          : undefined
+      style={{
+        backgroundImage: `url(${imageUrl})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "400px",
       }}
     >
+      {/* Скрытый img для отслеживания ошибки загрузки */}
       {cityInfo?.imageUrl && (
-        <img 
-          src={getProxiedImageUrl(cityInfo.imageUrl)}
-          alt="" 
-          style={{ display: 'none' }}
-          onError={(e) => {
-            console.error('Failed to load city image:', cityInfo.imageUrl);
-            setImageError(true);
-          }}
-          onLoad={(e) => {
-            console.log('City image loaded successfully:', cityInfo.imageUrl);
-            setImageLoaded(true);
-          }}
+        <img
+          src={cityInfo.imageUrl}
+          alt=""
+          style={{ display: "none" }}
+          onError={() => setImageError(true)}
         />
       )}
       <div className={styles.content}>
