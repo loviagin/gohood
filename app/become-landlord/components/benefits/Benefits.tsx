@@ -8,6 +8,9 @@ export function Benefits() {
         <h2 className={styles.sectionTitle}>
           Почему GoHood — платформа нового поколения для арендодателей
         </h2>
+        <p className={styles.sectionSubtitle}>
+          Мы создали сервис, который решает все проблемы арендодателей: от поиска жильцов до управления арендой
+        </p>
         <div className={styles.grid}>
           <div className={styles.card}>
             <Brain className={styles.icon} />

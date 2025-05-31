@@ -12,11 +12,23 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
+  line-height: 1.2;
+  color: #2563eb;
+  margin-bottom: 1.5rem;
   text-align: center;
-  margin-bottom: 4rem;
-  color: #1a1a1a;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  color: #475569;
+  margin-bottom: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 .stepsGrid {
@@ -108,8 +120,12 @@
   }
 
   .title {
-    font-size: 2rem;
-    margin-bottom: 3rem;
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    margin-bottom: 2rem;
   }
 
   .step {
@@ -127,8 +143,12 @@
   }
 
   .title {
-    font-size: 1.75rem;
-    margin-bottom: 2rem;
+    font-size: clamp(1.75rem, 5vw, 2rem);
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
   }
 
   .stepsGrid {

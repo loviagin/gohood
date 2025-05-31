@@ -270,6 +270,9 @@ export default function CitiesPage() {
             </Link>
           ))}
         </div>
+        <p className={styles.moreCities}>
+          Больше городов можно найти через поиск вверху страницы
+        </p>
       </div>
     </main>
   );

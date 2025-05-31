@@ -445,6 +445,11 @@
     font-size: clamp(0.8125rem, 1.75vw, 0.9375rem);
     min-width: clamp(80px, 15vw, 100px);
   }
+
+  .moreCities {
+    font-size: 0.875rem;
+    margin-top: 1.5rem;
+  }
 }
 
 /* Small mobile breakpoint */
@@ -482,6 +487,11 @@
   .suggestionsDropdown {
     width: 95% !important;
     max-width: none !important;
+  }
+
+  .moreCities {
+    font-size: 0.8125rem;
+    margin-top: 1.25rem;
   }
 }
 
@@ -538,4 +548,12 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.moreCities {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9375rem;
+  margin-top: 2rem;
+  padding: 0 clamp(0.5rem, 2vw, 1rem);
 } 

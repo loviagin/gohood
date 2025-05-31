@@ -29,6 +29,9 @@ export function HowItWorks() {
     <section className={styles.howItWorks}>
       <div className={styles.container}>
         <h2 className={styles.title}>Как это работает?</h2>
+        <p className={styles.subtitle}>
+          Простой и понятный процесс сдачи жилья в аренду — от размещения объявления до получения оплаты
+        </p>
         <div className={styles.stepsGrid}>
           {steps.map((step, index) => (
             <div key={index} className={styles.step}>

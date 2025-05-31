@@ -33,9 +33,9 @@ export default function Cities() {
           ))}
         </div>
         <div className={styles.buttonContainer}>
-          {/* <Link href="/cities" className={styles.allCitiesButton}>
+          <Link href="/cities" className={styles.allCitiesButton}>
             Все города
-          </Link> */}
+          </Link>
         </div>
       </div>
     </section>
