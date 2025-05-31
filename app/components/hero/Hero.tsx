@@ -480,7 +480,13 @@ const SuggestionsPortal = ({
   return createPortal(portalContent, document.body);
 };
 
-export default function Hero() {
+interface HeroProps {
+  title: string;
+  subtitle: string;
+  cta: string;
+}
+
+export default function Hero({ title, subtitle, cta }: HeroProps) {
   const [activeTab, setActiveTab] = useState<SearchTab>("housing");
   const [searchParams, setSearchParams] = useState<SearchParams>({
     location: "",
@@ -634,9 +640,9 @@ export default function Hero() {
     <section className={styles.hero} aria-label="Поиск жилья">
       <div className={styles.heroContent}>
         <h1 className={styles.title}>
-          Умный поиск жилья с ИИ
+          {title}
           <br />
-          <span className={styles.titleHighlight}>в идеальном районе</span>
+          <span className={styles.titleHighlight}>{subtitle}</span>
         </h1>
 
         <div className={styles.heroFeatures} role="list" aria-label="Преимущества сервиса">
@@ -802,12 +808,12 @@ export default function Hero() {
                 {isLoading ? (
                   <span className={styles.searchButtonContent}>
                     <span className={styles.searchButtonSpinner} aria-hidden="true" />
-                    Поиск...
+                    {cta}...
                   </span>
                 ) : (
                   <span className={styles.searchButtonContent}>
                     <Search className={styles.searchButtonIcon} aria-hidden="true" />
-                    Найти идеальное место
+                    {cta}
                   </span>
                 )}
               </button>

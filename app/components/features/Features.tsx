@@ -1,13 +1,18 @@
 import { Wifi, Key, MapPin, Building2, Globe, Shield } from "lucide-react";
 import styles from "./Features.module.css";
 
-export default function Features() {
+interface FeaturesProps {
+  title: string;
+  subtitle: string;
+}
+
+export default function Features({ title, subtitle }: FeaturesProps) {
   return (
     <section className={styles.features}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Почему выбирают GoHood.city</h2>
+        <h2 className={styles.title}>{title}</h2>
         <p className={styles.subtitle}>
-          GoHood — не просто аренда. Это комфорт в каждом районе
+          {subtitle}
         </p>
         <div className={styles.grid}>
           <div className={styles.card}>

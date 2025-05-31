@@ -40,7 +40,7 @@ export default function SignIn() {
             }
 
             toast.success('Вход выполнен успешно!');
-            router.push('/');
+            router.push('/account');
             router.refresh();
         } catch (error) {
             toast.error(error instanceof Error ? error.message : 'Ошибка при входе');

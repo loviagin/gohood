@@ -1,6 +1,11 @@
 import styles from "./Cities.module.css";
 import Link from "next/link";
 
+interface CitiesProps {
+  title: string;
+  subtitle: string;
+}
+
 const cities = [
   { name: "Москва", image: "/cities/moscow.webp" },
   { name: "Лондон", image: "/cities/london.webp" },
@@ -10,13 +15,13 @@ const cities = [
   { name: "Ярославль", image: "/cities/yaroslavl.webp" },
 ];
 
-export default function Cities() {
+export default function Cities({ title, subtitle }: CitiesProps) {
   return (
     <section className={styles.cities}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Города</h2>
+        <h2 className={styles.title}>{title}</h2>
         <p className={styles.subtitle}>
-          Исследуйте жильё в разных городах России и мира
+          {subtitle}
         </p>
         <div className={styles.grid}>
           {cities.map((city) => (

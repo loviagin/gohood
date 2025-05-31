@@ -1,0 +1,30 @@
+{
+  "Home": {
+    "hero": {
+      "title": "Find Your Perfect Hood",
+      "subtitle": "Discover neighborhoods that match your lifestyle",
+      "cta": "Get Started"
+    },
+    "features": {
+      "title": "Why Choose GoHood",
+      "subtitle": "Find your perfect neighborhood with our smart matching system"
+    },
+    "cities": {
+      "title": "Available Cities",
+      "subtitle": "Explore neighborhoods in these cities"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Find your perfect neighborhood in three simple steps"
+    },
+    "stats": {
+      "title": "Our Impact",
+      "subtitle": "Join thousands of happy residents"
+    },
+    "cta": {
+      "title": "Ready to Find Your Perfect Hood?",
+      "subtitle": "Start your journey today",
+      "button": "Get Started Now"
+    }
+  }
+} 

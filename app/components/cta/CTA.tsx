@@ -1,13 +1,19 @@
 import styles from './CTA.module.css';
 import Link from 'next/link';
 
-export default function CTA() {
+interface CTAProps {
+  title: string;
+  subtitle: string;
+  button: string;
+}
+
+export default function CTA({ title, subtitle, button }: CTAProps) {
   return (
     <section className={styles.cta}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Начните использовать GoHood сегодня</h2>
+        <h2 className={styles.title}>{title}</h2>
         <p className={styles.description}>
-          Присоединяйтесь к сообществу GoHood и найдите идеальное жилье или арендатора
+          {subtitle}
         </p>
         <div className={styles.buttons}>
           <Link href="/become-landlord/register" className={styles.button}>

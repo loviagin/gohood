@@ -1,5 +1,10 @@
 import styles from "./HowItWorks.module.css";
 
+interface HowItWorksProps {
+  title: string;
+  subtitle: string;
+}
+
 const steps = [
   {
     number: "01",
@@ -18,11 +23,12 @@ const steps = [
   }
 ];
 
-export default function HowItWorks() {
+export default function HowItWorks({ title, subtitle }: HowItWorksProps) {
   return (
     <section className={styles.howItWorks}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Как это работает</h2>
+        <h2 className={styles.title}>{title}</h2>
+        <p className={styles.subtitle}>{subtitle}</p>
         <div className={styles.stepsGrid}>
           {steps.map((step) => (
             <div key={step.number} className={styles.stepCard}>

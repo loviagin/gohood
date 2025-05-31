@@ -2,7 +2,6 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { FaUser, FaBuilding, FaCalendarAlt, FaStar, FaCog, FaSignOutAlt, FaHome, FaKey } from 'react-icons/fa';
 import { MdNotifications, MdPayment, MdMessage } from 'react-icons/md';
 import styles from './page.module.css';
@@ -10,12 +9,6 @@ import styles from './page.module.css';
 export default function Account() {
     const { data: session, status } = useSession();
     const router = useRouter();
-
-    useEffect(() => {
-        if (status === 'unauthenticated') {
-            router.push('/signin');
-        }
-    }, [status, router]);
 
     if (status === 'loading') {
         return (

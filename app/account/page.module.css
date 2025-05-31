@@ -8,7 +8,7 @@
     width: 280px;
     background-color: white;
     border-right: 1px solid #e9ecef;
-    padding: 24px;
+    padding: 6rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 32px;

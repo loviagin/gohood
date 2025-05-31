@@ -5,6 +5,11 @@ import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
 import { Home, MapPin, Users, Headset } from "lucide-react";
 
+interface StatsProps {
+  title: string;
+  subtitle: string;
+}
+
 const stats = [
   {
     number: 1000,
@@ -36,7 +41,7 @@ const stats = [
   }
 ];
 
-export default function Stats() {
+export default function Stats({ title, subtitle }: StatsProps) {
   const [ref, inView] = useInView({
     threshold: 0.1,
     triggerOnce: true
@@ -45,9 +50,9 @@ export default function Stats() {
   return (
     <section className={styles.stats} ref={ref}>
       <div className={styles.container}>
-        <h2 className={styles.title}>GoHood в цифрах</h2>
+        <h2 className={styles.title}>{title}</h2>
         <p className={styles.subtitle}>
-          Мы создаем комфортное пространство для жизни и работы в любом городе
+          {subtitle}
         </p>
         <div className={styles.grid}>
           {stats.map((stat) => {
