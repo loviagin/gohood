@@ -12,7 +12,7 @@ export default function ContactsPage() {
     return (
         <main className={styles.container}>
             <div className={styles.content}>
-                <h1 className={styles.title}>Contact Us</h1>
+                <h1 className={styles.title}>Связь с нами</h1>
 
                 <div className={styles.contactGrid}>
                     <div className={styles.contactInfo}>
@@ -39,7 +39,7 @@ export default function ContactsPage() {
                         <div className={styles.contactItem}>
                             <MdLocationOn className={styles.contactIcon} />
                             <div className={styles.contactText}>
-                                <div className={styles.contactLabel}>Address</div>
+                                <div className={styles.contactLabel}>Адрес</div>
                                 <div className={styles.contactValue}>
                                     LOVIGIN LTD<br />
                                     86-90 Paul Street<br />

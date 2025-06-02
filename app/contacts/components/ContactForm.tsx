@@ -50,7 +50,7 @@ export default function ContactForm() {
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.formGroup}>
-        <label htmlFor="name" className={styles.label}>Name</label>
+        <label htmlFor="name" className={styles.label}>Как к вам обращаться?</label>
         <input
           type="text"
           id="name"
@@ -59,7 +59,7 @@ export default function ContactForm() {
           onChange={handleChange}
           className={styles.input}
           required
-          placeholder="Your name"
+          placeholder="Ваше имя"
         />
       </div>
 
@@ -78,7 +78,7 @@ export default function ContactForm() {
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="subject" className={styles.label}>Subject</label>
+        <label htmlFor="subject" className={styles.label}>Тема</label>
         <input
           type="text"
           id="subject"
@@ -87,12 +87,12 @@ export default function ContactForm() {
           onChange={handleChange}
           className={styles.input}
           required
-          placeholder="What is this regarding?"
+          placeholder="Тема сообщения"
         />
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="message" className={styles.label}>Message</label>
+        <label htmlFor="message" className={styles.label}>Сообщение</label>
         <textarea
           id="message"
           name="message"
@@ -100,7 +100,7 @@ export default function ContactForm() {
           onChange={handleChange}
           className={styles.textarea}
           required
-          placeholder="Your message..."
+          placeholder="Ваше сообщение..."
         />
       </div>
 
@@ -109,7 +109,7 @@ export default function ContactForm() {
         className={styles.submitButton}
         disabled={isSubmitting}
       >
-        {isSubmitting ? 'Sending...' : 'Send Message'}
+        {isSubmitting ? 'Отправка...' : 'Отправить сообщение'}
       </button>
     </form>
   );
