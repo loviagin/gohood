@@ -1,24 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Listing from '@/models/Listing';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: any 
 ) {
+  const { id } = context.params;
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Listing ID is required' },
+      { status: 400 }
+    );
+  }
+
   try {
     await connectDB();
-    
-    // Ensure params.id is available
-    if (!params?.id) {
-      return NextResponse.json(
-        { error: 'Listing ID is required' },
-        { status: 400 }
-      );
-    }
 
-    const listing = await Listing.findById(params.id)
-      .populate('ownerId', 'name email avatar');
+    const listing = await Listing.findById(id)
+      .populate('ownerId', 'name email avatar')
+      .lean();
 
     if (!listing) {
       return NextResponse.json(
@@ -29,10 +30,10 @@ export async function GET(
 
     return NextResponse.json(listing);
   } catch (error) {
-    console.error('Error fetching listing:', error);
+    console.error('Error in GET /api/listings/[id]:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
-} 
+}

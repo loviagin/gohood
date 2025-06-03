@@ -28,6 +28,39 @@ export default function AddressAutocomplete({ value, onChange, className }: Addr
         fields: ['address_components', 'formatted_address'],
       });
 
+      // Add custom styles to Google Places Autocomplete
+      const style = document.createElement('style');
+      style.textContent = `
+        .pac-container {
+          border-radius: 8px !important;
+          margin-top: 4px !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+          border: 1px solid #e2e8f0 !important;
+          font-family: inherit !important;
+        }
+        .pac-item {
+          padding: 8px 12px !important;
+          font-size: 14px !important;
+          cursor: pointer !important;
+          transition: background-color 0.2s !important;
+        }
+        .pac-item:hover {
+          background-color: #f8fafc !important;
+        }
+        .pac-item-query {
+          font-size: 14px !important;
+          color: #1e293b !important;
+        }
+        .pac-matched {
+          font-weight: 600 !important;
+          color: #3b82f6 !important;
+        }
+        .pac-icon {
+          margin-right: 8px !important;
+        }
+      `;
+      document.head.appendChild(style);
+
       autocomplete.addListener('place_changed', () => {
         const place = autocomplete.getPlace();
         console.log('Selected place:', place);
