@@ -18,6 +18,7 @@ export interface IUser extends Document {
   yandexId?: string;
   vkId?: string;
   appleId?: string;
+  listings: mongoose.Types.ObjectId[];
 }
 
 const UserSchema = new Schema<IUser>(
@@ -50,7 +51,8 @@ const UserSchema = new Schema<IUser>(
     vkId: String,
     appleId: String,
     verifiedTenant: { type: Boolean, default: false },
-    verifiedLandlord: { type: Boolean, default: false }
+    verifiedLandlord: { type: Boolean, default: false },
+    listings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Listing' }]
   },
   { timestamps: true }
 );

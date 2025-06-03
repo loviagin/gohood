@@ -7,6 +7,8 @@ import AppleProvider from "next-auth/providers/apple";
 import VkProvider from "next-auth/providers/vk";
 import UserModel from "@/models/User";
 import bcrypt from "bcryptjs";
+import connectDB from './db';
+import mongoose from 'mongoose';
 
 declare module "next-auth" {
     interface Session extends DefaultSession {
@@ -14,6 +16,7 @@ declare module "next-auth" {
             id: string;
             role: string;
             profileCompleted: boolean;
+            listings: string[];
         } & DefaultSession["user"]
     }
 }
@@ -23,12 +26,14 @@ declare module "next-auth/jwt" {
         id: string;
         role: string;
         profileCompleted: boolean;
+        listings: string[];
     }
 }
 
 type CustomUser = NextAuthUser & {
     role: string;
     profileCompleted: boolean;
+    listings: string[];
 };
 
 export const authOptions: AuthOptions = {
@@ -61,6 +66,10 @@ export const authOptions: AuthOptions = {
                 token.id = user.id;
                 token.role = user.role;
                 token.profileCompleted = user.profileCompleted;
+                token.listings = user.listings;
+            }
+            if (account) {
+                token.provider = account.provider;
             }
             return token;
         },
@@ -75,6 +84,7 @@ export const authOptions: AuthOptions = {
                         session.user.email = user.email;
                         session.user.role = user.role;
                         session.user.profileCompleted = user.profileCompleted;
+                        session.user.listings = user.listings?.map((id: mongoose.Types.ObjectId) => id.toString()) || [];
                     } else {
                         // If user not found in database, clear the session data
                         session.user = {
@@ -83,7 +93,8 @@ export const authOptions: AuthOptions = {
                             name: '',
                             email: '',
                             role: 'user',
-                            profileCompleted: false
+                            profileCompleted: false,
+                            listings: []
                         };
                     }
                 } catch (error) {
@@ -95,7 +106,8 @@ export const authOptions: AuthOptions = {
                         name: '',
                         email: '',
                         role: 'user',
-                        profileCompleted: false
+                        profileCompleted: false,
+                        listings: []
                     };
                 }
             }
@@ -129,7 +141,8 @@ export const authOptions: AuthOptions = {
                             email: user.email,
                             name: user.name,
                             role: 'landlord',
-                            profileCompleted: false
+                            profileCompleted: false,
+                            listings: []
                         };
 
                         // Set the appropriate social ID based on provider
@@ -174,7 +187,8 @@ export const authOptions: AuthOptions = {
                     name: profile.name?.firstName,
                     email: profile.email,
                     role: 'landlord',
-                    profileCompleted: false
+                    profileCompleted: false,
+                    listings: []
                 }
             }
         }),
@@ -203,7 +217,8 @@ export const authOptions: AuthOptions = {
                     name: user.name,
                     email: user.email,
                     role: user.role,
-                    profileCompleted: user.profileCompleted
+                    profileCompleted: user.profileCompleted,
+                    listings: user.listings?.map((id: mongoose.Types.ObjectId) => id.toString()) || []
                 };
             }
         })
