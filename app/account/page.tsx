@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { FaUser, FaBuilding, FaCalendarAlt, FaStar, FaCog, FaSignOutAlt, FaHome, FaKey } from 'react-icons/fa';
 import { MdNotifications, MdPayment, MdMessage } from 'react-icons/md';
 import styles from './page.module.css';
+import Link from 'next/link';
 
 export default function Account() {
     const { data: session, status } = useSession();
@@ -184,10 +185,10 @@ export default function Account() {
                         <MdNotifications className={styles.navIcon} />
                         Уведомления
                     </button>
-                    <button className={styles.navButton}>
+                    <Link href={'/account/settings'} className={styles.navButton}>
                         <FaCog className={styles.navIcon} />
                         Настройки
-                    </button>
+                    </Link>
                     <button 
                         className={styles.navButton}
                         onClick={() => router.push('/api/auth/signout')}
