@@ -56,8 +56,7 @@ export async function searchHotels(params: SearchParams): Promise<HotelResult[]>
     location: params.location,
     checkIn: format(params.checkIn, 'yyyy-MM-dd'),
     checkOut: format(params.checkOut, 'yyyy-MM-dd'),
-    adults: params.adults?.toString() || params.guests.toString(),
-    children: params.children?.join(',') || '',
+    guests: params.guests.toString(),
     currency: params.currency || 'RUB',
     lang: params.lang || 'ru',
   });
@@ -132,8 +131,7 @@ export async function getHotelDetails(hotelId: number, params: Omit<SearchParams
     hotelId: hotelId.toString(),
     checkIn: format(params.checkIn, 'yyyy-MM-dd'),
     checkOut: format(params.checkOut, 'yyyy-MM-dd'),
-    adults: params.adults?.toString() || params.guests.toString(),
-    children: params.children?.join(',') || '',
+    guests: params.guests.toString(),
     currency: params.currency || 'RUB',
     lang: params.lang || 'ru',
   });

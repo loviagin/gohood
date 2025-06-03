@@ -550,6 +550,7 @@ export default function Hero() {
       });
 
       // Перенаправляем на страницу поиска
+      console.log(`/search?${queryParams.toString()}`);
       router.push(`/search?${queryParams.toString()}`);
     } catch (err) {
       console.error('Search error:', err);
