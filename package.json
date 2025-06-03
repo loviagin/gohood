@@ -15,6 +15,7 @@
     "@types/mongoose": "^5.11.96",
     "@types/react-input-mask": "^3.0.6",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.6.1",
     "date-fns": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.511.0",
