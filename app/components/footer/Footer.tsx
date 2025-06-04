@@ -18,7 +18,7 @@ const Footer = () => {
                     <Link href="/cities" className={styles.link}>
                         Города
                     </Link>
-                    <Link href="/services" className={styles.link}>
+                    <Link href="/service" className={styles.link}>
                         Услуги
                     </Link>
                     <Link href="/contacts" className={styles.link}>

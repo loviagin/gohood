@@ -105,7 +105,7 @@ function SearchPageContent() {
             </div>
           </div>
         </div>
-
+        <script async src="https://tpwdgt.com/content?currency=rub&trs=422801&shmarker=635726&type=compact&host=search.hotellook.com&locale=ru&limit=10&powered_by=false&nobooking=&id=12153&categories=center&primary=%23ff8e00&special=%23e0e0e0&promo_id=4026&campaign_id=101"></script>        
         {isLoading ? (
           <div className={styles.loading}>
             <div className={styles.spinner} />
