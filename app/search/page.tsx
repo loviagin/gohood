@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { searchHotels, type HotelResult } from "../services/hotellook";
 import CityHero from "./components/search/CityHero";
+import Script from "next/script";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +35,7 @@ function SearchPageContent() {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const searchResults = await searchHotels({
           location,
           checkIn,
@@ -81,7 +82,7 @@ function SearchPageContent() {
     <main className={styles.main}>
       <div className={styles.container}>
         {location && <CityHero cityName={location} />}
-        
+
         <div className={styles.searchSummary}>
           <h1 className={styles.title}>Результаты поиска</h1>
           <div className={styles.searchParams}>
@@ -105,8 +106,15 @@ function SearchPageContent() {
             </div>
           </div>
         </div>
-        <script async src="https://tpwdgt.com/content?currency=rub&trs=422801&shmarker=635726&type=compact&host=search.hotellook.com&locale=ru&limit=10&powered_by=false&nobooking=&id=12153&categories=center&primary=%23ff8e00&special=%23e0e0e0&promo_id=4026&campaign_id=101"></script>        
-        {isLoading ? (
+
+        <Script
+          async
+          src="https://tpwdgt.com/content?currency=rub&trs=422801&shmarker=635726&type=compact&host=search.hotellook.com&locale=ru&limit=10&powered_by=false&nobooking=&id=12153&categories=center&primary=%23ff8e00&special=%23e0e0e0&promo_id=4026&campaign_id=101"
+          strategy="afterInteractive"
+        />
+
+
+        {/* {isLoading ? (
           <div className={styles.loading}>
             <div className={styles.spinner} />
             <p>Поиск жилья...</p>
@@ -127,8 +135,8 @@ function SearchPageContent() {
             {results.map((hotel) => (
               <article key={hotel.id} className={styles.resultCard}>
                 <div className={styles.resultImage}>
-                  <img 
-                    src={hotel.images[0] || '/images/placeholder.jpg'} 
+                  <img
+                    src={hotel.images[0] || '/images/placeholder.jpg'}
                     alt={hotel.name}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
@@ -169,7 +177,7 @@ function SearchPageContent() {
               </article>
             ))}
           </div>
-        )}
+        )} */}
       </div>
     </main>
   );
