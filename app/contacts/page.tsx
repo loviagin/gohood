@@ -39,12 +39,10 @@ export default function ContactsPage() {
                         <div className={styles.contactItem}>
                             <MdLocationOn className={styles.contactIcon} />
                             <div className={styles.contactText}>
-                                <div className={styles.contactLabel}>Адрес</div>
+                                <div className={styles.contactLabel}>Представитель</div>
                                 <div className={styles.contactValue}>
-                                    LOVIGIN LTD<br />
-                                    86-90 Paul Street<br />
-                                    London, EC2A 4NE<br />
-                                    United Kingdom
+                                    Ловягин Илья Александрович<br />
+                                    ИНН 760605381662
                                 </div>
                             </div>
                         </div>
