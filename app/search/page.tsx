@@ -113,7 +113,6 @@ function SearchPageContent() {
           strategy="afterInteractive"
         />
 
-
         {/* {isLoading ? (
           <div className={styles.loading}>
             <div className={styles.spinner} />

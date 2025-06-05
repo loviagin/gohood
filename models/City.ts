@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface CityDocument extends Document {
+// Интерфейс для данных города без методов Mongoose
+export interface CityData {
   name: string;
   fullName: string;
   country: string;
@@ -24,9 +25,55 @@ export interface CityDocument extends Document {
     lat?: number;
     lng?: number;
   };
+  transportation: {
+    types: Array<{
+      name: string;
+      description: string;
+      paymentMethods: string[];
+      tips: string;
+    }>;
+    generalInfo: string;
+  };
+  mobileOperators: Array<{
+    name: string;
+    website: string;
+    hasESim: boolean;
+    description: string;
+  }>;
+  districts: Array<{
+    name: string;
+    population: number;
+    demographics: {
+      white: number;
+      african: number;
+      other: number;
+    };
+    safety: {
+      daytime: number;
+      nighttime: number;
+    };
+    transport: {
+      score: number;
+      description: string;
+    };
+    network: {
+      coverage: number;
+      description: string;
+    };
+    tourism: {
+      popularity: number;
+      description: string;
+    };
+    rating: {
+      score: number;
+      factors: string[];
+    };
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface CityDocument extends Document, CityData {}
 
 const citySchema = new Schema<CityDocument>({
   name: { type: String, required: true, unique: true },
@@ -51,7 +98,51 @@ const citySchema = new Schema<CityDocument>({
   location: {
     lat: Number,
     lng: Number
-  }
+  },
+  transportation: {
+    types: [{
+      name: String,
+      description: String,
+      paymentMethods: [String],
+      tips: String
+    }],
+    generalInfo: String
+  },
+  mobileOperators: [{
+    name: String,
+    website: String,
+    hasESim: Boolean,
+    description: String
+  }],
+  districts: [{
+    name: String,
+    population: Number,
+    demographics: {
+      white: Number,
+      african: Number,
+      other: Number
+    },
+    safety: {
+      daytime: Number,
+      nighttime: Number
+    },
+    transport: {
+      score: Number,
+      description: String
+    },
+    network: {
+      coverage: Number,
+      description: String
+    },
+    tourism: {
+      popularity: Number,
+      description: String
+    },
+    rating: {
+      score: Number,
+      factors: [String]
+    }
+  }]
 }, {
   timestamps: true // Автоматически добавляет createdAt и updatedAt
 });

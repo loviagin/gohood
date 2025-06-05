@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FaHome, FaMapMarkerAlt, FaImages, FaInfoCircle, FaCheck, FaTimes, FaShieldAlt } from 'react-icons/fa';
 import styles from './page.module.css';
-import AddressAutocomplete from '@/app/components/AddressAutocomplete';
+import AddressAutocomplete from './components/addressAutocomplete/AddressAutocomplete';
 
 type PropertyCategory = 'apartment' | 'house' | 'studio' | 'room' | 'townhouse' | 'apartments';
 type ParkingType = 'none' | 'free' | 'paid';

@@ -103,7 +103,7 @@ export default function AddressAutocomplete({ value, onChange, className }: Addr
 
     // Load the Google Places API script
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBv_h_dBxQzUZH_8ElcCmH0ZyJpsakRG6Q&libraries=places&language=ru&callback=initAutocomplete`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&language=ru&callback=initAutocomplete`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);

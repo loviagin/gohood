@@ -250,15 +250,15 @@ export default function CitiesPage() {
               buttonRef={searchInputRef}
             />
           </div>
-          <button type="submit" className={styles.searchButton}>
+          <Link href={`/cities/${searchQuery}`} className={styles.searchButton}>
             <Search className={styles.searchButtonIcon} aria-hidden="true" />
             Найти
-          </button>
+          </Link>
         </form>
 
         <div className={styles.grid}>
           {cities.map((city) => (
-            <Link href={`/cities`} key={city.name} className={styles.card}>
+            <Link href={`/cities/${city.name}`} key={city.name} className={styles.card}>
               <img
                 src={city.image}
                 alt={city.name}

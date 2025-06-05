@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MapPin, Users, Clock, Globe, Thermometer, Calendar, Star, Utensils } from 'lucide-react';
+import { Users, Clock, Globe, Thermometer, Calendar, Star, Utensils, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import styles from './CityHero.module.css';
 import type { CityDocument } from '@/models/City';
 
@@ -15,6 +15,7 @@ export default function CityHero({ cityName }: CityHeroProps) {
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Функция для получения проксированного URL изображения
   const getProxiedImageUrl = (url: string) => {
@@ -89,81 +90,111 @@ export default function CityHero({ cityName }: CityHeroProps) {
         />
       )}
       <div className={styles.content}>
-        <h1 className={styles.title}>{cityInfo.fullName}</h1>
+        <div className={styles.titleContainer}>
+          <h1 className={styles.title}>{cityInfo.fullName}</h1>
+          <button 
+            className={styles.readMoreButton}
+            onClick={() => window.location.href = `/cities/${cityName}`}
+          >
+            <ExternalLink size={16} />
+            Читать подробнее
+          </button>
+        </div>
         <p className={styles.description}>{cityInfo.description}</p>
         
-        <div className={styles.details}>
-          {cityInfo.details.population && (
-            <div className={styles.detail}>
-              <Users className={styles.detailIcon} />
-              <span>Население: {cityInfo.details.population.toLocaleString()}</span>
-            </div>
-          )}
-          {cityInfo.details.language && (
-            <div className={styles.detail}>
-              <Globe className={styles.detailIcon} />
-              <span>Язык: {cityInfo.details.language}</span>
-            </div>
-          )}
-          {cityInfo.details.currency && (
-            <div className={styles.detail}>
-              <span className={styles.detailIcon}>₽</span>
-              <span>Валюта: {cityInfo.details.currency}</span>
-            </div>
-          )}
-          {cityInfo.details.timezone && (
-            <div className={styles.detail}>
-              <Clock className={styles.detailIcon} />
-              <span>Часовой пояс: {cityInfo.details.timezone}</span>
-            </div>
-          )}
-          {cityInfo.details.averageTemperature?.summer && (
-            <div className={styles.detail}>
-              <Thermometer className={styles.detailIcon} />
-              <span>Летом: {cityInfo.details.averageTemperature.summer}°C</span>
-            </div>
-          )}
-          {cityInfo.details.averageTemperature?.winter && (
-            <div className={styles.detail}>
-              <Thermometer className={styles.detailIcon} />
-              <span>Зимой: {cityInfo.details.averageTemperature.winter}°C</span>
-            </div>
-          )}
-          {cityInfo.details.bestTimeToVisit && (
-            <div className={styles.detail}>
-              <Calendar className={styles.detailIcon} />
-              <span>Лучшее время: {cityInfo.details.bestTimeToVisit}</span>
-            </div>
-          )}
-        </div>
-
-        {cityInfo.details.attractions && cityInfo.details.attractions.length > 0 && (
-          <div className={styles.attractions}>
-            <h2 className={styles.attractionsTitle}>Достопримечательности</h2>
-            <div className={styles.attractionsList}>
-              {cityInfo.details.attractions.map((attraction, index) => (
-                <div key={index} className={styles.attraction}>
-                  <Star className={styles.detailIcon} />
-                  <span>{attraction}</span>
+        {isExpanded && (
+          <>
+            <div className={styles.details}>
+              {cityInfo.details.population && (
+                <div className={styles.detail}>
+                  <Users className={styles.detailIcon} />
+                  <span>Население: {cityInfo.details.population.toLocaleString()}</span>
                 </div>
-              ))}
+              )}
+              {cityInfo.details.language && (
+                <div className={styles.detail}>
+                  <Globe className={styles.detailIcon} />
+                  <span>Язык: {cityInfo.details.language}</span>
+                </div>
+              )}
+              {cityInfo.details.currency && (
+                <div className={styles.detail}>
+                  <span className={styles.detailIcon}>₽</span>
+                  <span>Валюта: {cityInfo.details.currency}</span>
+                </div>
+              )}
+              {cityInfo.details.timezone && (
+                <div className={styles.detail}>
+                  <Clock className={styles.detailIcon} />
+                  <span>Часовой пояс: {cityInfo.details.timezone}</span>
+                </div>
+              )}
+              {cityInfo.details.averageTemperature?.summer && (
+                <div className={styles.detail}>
+                  <Thermometer className={styles.detailIcon} />
+                  <span>Летом: {cityInfo.details.averageTemperature.summer}°C</span>
+                </div>
+              )}
+              {cityInfo.details.averageTemperature?.winter && (
+                <div className={styles.detail}>
+                  <Thermometer className={styles.detailIcon} />
+                  <span>Зимой: {cityInfo.details.averageTemperature.winter}°C</span>
+                </div>
+              )}
+              {cityInfo.details.bestTimeToVisit && (
+                <div className={styles.detail}>
+                  <Calendar className={styles.detailIcon} />
+                  <span>Лучшее время: {cityInfo.details.bestTimeToVisit}</span>
+                </div>
+              )}
             </div>
-          </div>
+
+            {cityInfo.details.attractions && cityInfo.details.attractions.length > 0 && (
+              <div className={styles.attractions}>
+                <h2 className={styles.attractionsTitle}>Достопримечательности</h2>
+                <div className={styles.attractionsList}>
+                  {cityInfo.details.attractions.map((attraction, index) => (
+                    <div key={index} className={styles.attraction}>
+                      <Star className={styles.detailIcon} />
+                      <span>{attraction}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {cityInfo.details.localCuisine && cityInfo.details.localCuisine.length > 0 && (
+              <div className={styles.cuisine}>
+                <h2 className={styles.cuisineTitle}>Местная кухня</h2>
+                <div className={styles.cuisineList}>
+                  {cityInfo.details.localCuisine.map((dish, index) => (
+                    <div key={index} className={styles.dish}>
+                      <Utensils className={styles.detailIcon} />
+                      <span>{dish}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        {cityInfo.details.localCuisine && cityInfo.details.localCuisine.length > 0 && (
-          <div className={styles.cuisine}>
-            <h2 className={styles.cuisineTitle}>Местная кухня</h2>
-            <div className={styles.cuisineList}>
-              {cityInfo.details.localCuisine.map((dish, index) => (
-                <div key={index} className={styles.dish}>
-                  <Utensils className={styles.detailIcon} />
-                  <span>{dish}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <button 
+          className={styles.expandButton}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp size={16} />
+              Свернуть
+            </>
+          ) : (
+            <>
+              <ChevronDown size={16} />
+              Развернуть
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

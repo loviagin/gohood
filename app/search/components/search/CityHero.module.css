@@ -32,11 +32,19 @@
   gap: 1.5rem;
 }
 
+.titleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .title {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 800;
-  line-height: 1.2;
   margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -244,4 +252,45 @@
   .cuisineTitle {
     font-size: 1.125rem;
   }
+}
+
+.readMoreButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  white-space: nowrap;
+}
+
+.readMoreButton:hover {
+  background-color: #1d4ed8;
+}
+
+.expandButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  margin-top: 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+.expandButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 } 

@@ -1,4 +1,4 @@
-import { City, type CityDocument } from '@/models/City';
+import { City, type CityDocument, CityData } from '@/models/City';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import connectDB from '@/lib/db';
 
@@ -36,6 +36,8 @@ async function generateCityInfo(cityName: string): Promise<CityInfo> {
     throw new Error('API ключ Google AI не настроен');
   }
 
+  console.log('Starting city info generation for:', cityName);
+
   const model = genAI.getGenerativeModel({ 
     model: "gemini-2.0-flash",
     generationConfig: {
@@ -46,7 +48,11 @@ async function generateCityInfo(cityName: string): Promise<CityInfo> {
     }
   });
 
-  const prompt = `Ты - API, который возвращает информацию о городах. Верни ТОЛЬКО JSON объект без каких-либо дополнительных символов, комментариев или форматирования. Для поля imageUrl используй прямую ссылку на изображение города с Pexels или Unsplash, обязательно включая расширение файла (например, https://images.pexels.com/photos/.../photo.jpg или https://images.unsplash.com/photo-.../photo.jpg). Вот структура JSON для города ${cityName}:
+  const prompt = `Ты - API, который возвращает информацию о городах. Верни ТОЛЬКО JSON объект без каких-либо дополнительных символов, комментариев или форматирования. Для поля imageUrl используй прямую ссылку на изображение города с Pexels или Unsplash, обязательно включая расширение файла (например, https://images.pexels.com/photos/.../photo.jpg или https://images.unsplash.com/photo-.../photo.jpg). 
+
+  Важно: Все числовые рейтинги (rating.score) должны быть в диапазоне от 0 до 100, где 100 - это наивысший рейтинг.
+
+  Вот структура JSON для города ${cityName}:
   {
     "name": "название города",
     "fullName": "полное название города с указанием страны",
@@ -70,15 +76,24 @@ async function generateCityInfo(cityName: string): Promise<CityInfo> {
     "location": {
       "lat": широта,
       "lng": долгота
-    }
+    },
+    "districts": [
+      {
+        "name": "название района",
+        "rating": {
+          "score": число от 0 до 100, // где 100 - наивысший рейтинг
+          "factors": ["фактор 1", "фактор 2", ...]
+        }
+      }
+    ]
   }`;
 
   try {
-    console.log('Attempting to generate city info for:', cityName);
+    console.log('Sending prompt to Gemini:', prompt);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log('Raw response from model:', text);
+    console.log('Raw response from Gemini:', text);
     
     // Очищаем ответ от markdown-разметки и других возможных символов
     const cleanJson = text
@@ -91,7 +106,7 @@ async function generateCityInfo(cityName: string): Promise<CityInfo> {
     
     try {
       const cityInfo = JSON.parse(cleanJson) as CityInfo;
-      console.log('Successfully parsed city info');
+      console.log('Successfully parsed city info:', cityInfo);
 
       return cityInfo;
     } catch (parseError) {
@@ -132,6 +147,7 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
 
     // Если город найден — просто возвращаем его, ничего не обновляем
     if (city) {
+      console.log('Returning existing city:', city);
       return city;
     }
 
@@ -139,13 +155,13 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
     try {
       console.log('Generating city info with Gemini...');
       const cityInfo = await generateCityInfo(cityName);
-      console.log('City info generated successfully');
+      console.log('City info generated successfully:', cityInfo);
       try {
         city = await City.create({
           ...cityInfo,
           lastUpdated: new Date(),
         });
-        console.log('New city record created');
+        console.log('New city record created:', city);
       } catch (createError: any) {
         // Если возникла ошибка дублирования, пробуем найти существующую запись
         if (createError.code === 11000) {
@@ -157,7 +173,7 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
             ]
           });
           if (city) {
-            console.log('Found existing city record after duplicate error');
+            console.log('Found existing city record after duplicate error:', city);
             return city;
           }
         }
@@ -176,5 +192,64 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
       cityName
     });
     throw error;
+  }
+}
+
+export async function getCityByName(name: string): Promise<CityDocument | null> {
+  try {
+    console.log('DB: Searching for city:', name);
+    await connectDB();
+    
+    // Нормализуем имя города
+    const normalizedName = name.trim().toLowerCase();
+    console.log('DB: Normalized name:', normalizedName);
+    
+    // Извлекаем название города из полного имени (до первой запятой)
+    const cityName = normalizedName.split(',')[0].trim();
+    console.log('DB: Extracted city name:', cityName);
+    
+    // Ищем город по имени или полному имени (регистронезависимый поиск)
+    const city = await City.findOne({
+      $or: [
+        { name: { $regex: new RegExp(`^${cityName}$`, 'i') } },
+        { fullName: { $regex: new RegExp(normalizedName, 'i') } }
+      ]
+    });
+    
+    console.log('DB: Search result:', city ? 'Found' : 'Not found');
+    if (city) {
+      console.log('DB: Found city:', {
+        name: city.name,
+        fullName: city.fullName,
+        country: city.country,
+        hasDetails: !!city.details,
+        hasTransportation: !!city.transportation,
+        hasDistricts: !!city.districts
+      });
+    }
+    
+    return city;
+  } catch (error) {
+    console.error('DB: Error in getCityByName:', error);
+    return null;
+  }
+}
+
+export async function createCity(cityData: CityData): Promise<CityDocument | null> {
+  try {
+    console.log('DB: Creating new city with data:', cityData);
+    await connectDB();
+    
+    const city = await City.create(cityData);
+    console.log('DB: City created successfully:', {
+      name: city.name,
+      fullName: city.fullName,
+      country: city.country
+    });
+    
+    return city;
+  } catch (error) {
+    console.error('DB: Error creating city:', error);
+    return null;
   }
 } 
