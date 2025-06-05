@@ -6,15 +6,12 @@ import { MapPin, Search, Home, Building2, House, Building, Users, Calendar as Ca
 import styles from "./page.module.css";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { searchHotels, type HotelResult } from "../services/hotellook";
 import CityHero from "./components/search/CityHero";
-import Script from "next/script";
 
 export const dynamic = "force-dynamic";
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
-  const [results, setResults] = useState<HotelResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,17 +33,17 @@ function SearchPageContent() {
         setIsLoading(true);
         setError(null);
 
-        const searchResults = await searchHotels({
+        console.log('Searching with params:', {
           location,
-          checkIn,
-          checkOut,
-          guests,
+          checkIn: checkIn.toISOString(),
+          checkOut: checkOut.toISOString(),
+          guests
         });
-
-        setResults(searchResults);
       } catch (err) {
         console.error('Search error:', err);
-        setError("Произошла ошибка при поиске жилья. Пожалуйста, попробуйте позже.");
+        // Show more specific error message if available
+        const errorMessage = err instanceof Error ? err.message : "Произошла ошибка при поиске жилья. Пожалуйста, попробуйте позже.";
+        setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -107,13 +104,7 @@ function SearchPageContent() {
           </div>
         </div>
 
-        <Script
-          async
-          src="https://tpwdgt.com/content?currency=rub&trs=422801&shmarker=635726&type=compact&host=search.hotellook.com&locale=ru&limit=10&powered_by=false&nobooking=&id=12153&categories=center&primary=%23ff8e00&special=%23e0e0e0&promo_id=4026&campaign_id=101"
-          strategy="afterInteractive"
-        />
-
-        {/* {isLoading ? (
+        {isLoading ? (
           <div className={styles.loading}>
             <div className={styles.spinner} />
             <p>Поиск жилья...</p>
@@ -122,61 +113,14 @@ function SearchPageContent() {
           <div className={styles.error}>
             <p>{error}</p>
           </div>
-        ) : results.length === 0 ? (
+        ) : (
           <div className={styles.noResults}>
             <p>По вашему запросу ничего не найдено</p>
             <p className={styles.noResultsSubtext}>
               Попробуйте изменить параметры поиска или посмотрите другие варианты
             </p>
           </div>
-        ) : (
-          <div className={styles.resultsGrid}>
-            {results.map((hotel) => (
-              <article key={hotel.id} className={styles.resultCard}>
-                <div className={styles.resultImage}>
-                  <img
-                    src={hotel.images[0] || '/images/placeholder.jpg'}
-                    alt={hotel.name}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/images/placeholder.jpg';
-                    }}
-                  />
-                  <div className={styles.resultType}>
-                    <Building2 className={styles.resultIcon} />
-                    <span>Отель {hotel.stars}★</span>
-                  </div>
-                </div>
-                <div className={styles.resultContent}>
-                  <h2 className={styles.resultTitle}>{hotel.name}</h2>
-                  <p className={styles.resultLocation}>
-                    <MapPin className={styles.locationIcon} />
-                    {hotel.location.city}, {hotel.location.address}
-                  </p>
-                  <div className={styles.resultDetails}>
-                    <div className={styles.starsContainer}>
-                      {getStars(hotel.stars)}
-                    </div>
-                    <span>•</span>
-                    <span>{hotel.rating.reviews} отзывов</span>
-                  </div>
-                  <div className={styles.resultFooter}>
-                    <div className={styles.resultRating}>
-                      <span className={styles.ratingValue}>{hotel.rating.score.toFixed(1)}</span>
-                      <span className={styles.ratingLabel}>отлично</span>
-                    </div>
-                    <div className={styles.resultPrice}>
-                      <span className={styles.priceValue}>
-                        {formatPrice(hotel.price.amount, hotel.price.currency)}
-                      </span>
-                      <span className={styles.pricePeriod}>за ночь</span>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        )} */}
+        )}
       </div>
     </main>
   );

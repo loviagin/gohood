@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const OSTROVOK_API_URL = 'https://api.ostrovok.ru/v3';
-const OSTROVOK_API_KEY = process.env.NEXT_PUBLIC_OSTROVOK_API_KEY;
-const OSTROVOK_API_SECRET = process.env.NEXT_PUBLIC_OSTROVOK_API_SECRET;
+const HOTELLOOK_API_URL = 'https://engine.hotellook.com/api/v2';
+const TRAVELPAYOUTS_TOKEN = process.env.NEXT_PUBLIC_TRAVELPAYOUTS_TOKEN;
 
 export async function GET(request: NextRequest) {
-  if (!OSTROVOK_API_KEY || !OSTROVOK_API_SECRET) {
+  if (!TRAVELPAYOUTS_TOKEN) {
+    console.error('Travelpayouts token is not configured');
     return NextResponse.json(
-      { error: 'Ostrovok API credentials are not configured' },
+      { error: 'Travelpayouts token is not configured' },
       { status: 500 }
     );
   }
 
   const searchParams = request.nextUrl.searchParams;
-
+  
   // Validate required parameters
-  const requiredParams = ['location', 'checkIn', 'checkOut', 'guests'];
+  const requiredParams = ['location', 'checkIn', 'checkOut', 'adults'];
   const missingParams = requiredParams.filter(param => !searchParams.has(param));
-
+  
   if (missingParams.length > 0) {
+    console.error('Missing required parameters:', missingParams);
     return NextResponse.json(
       { error: `Missing required parameters: ${missingParams.join(', ')}` },
       { status: 400 }
@@ -26,86 +27,96 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const location = searchParams.get('location');
-    const checkIn = searchParams.get('checkIn');
-    const checkOut = searchParams.get('checkOut');
-    const guests = searchParams.get('guests');
+    // Add token to search params
+    searchParams.set('token', TRAVELPAYOUTS_TOKEN);
 
-    if (!location || !checkIn || !checkOut || !guests) {
+    // First, verify the location exists
+    const locationId = searchParams.get('location');
+    const locationUrl = `${HOTELLOOK_API_URL}/lookup.json?query=${locationId}&token=${TRAVELPAYOUTS_TOKEN}`;
+    
+    console.log('Verifying location:', locationUrl);
+    const locationResponse = await fetch(locationUrl);
+    
+    if (!locationResponse.ok) {
+      console.error('Location verification failed:', {
+        status: locationResponse.status,
+        statusText: locationResponse.statusText
+      });
       return NextResponse.json(
-        { error: 'All parameters must have values' },
+        { error: 'Invalid location ID' },
         { status: 400 }
       );
     }
 
-    // First, search for the region/city ID
-    const regionSearchResponse = await fetch(`${OSTROVOK_API_URL}/region/search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${Buffer.from(`${OSTROVOK_API_KEY}:${OSTROVOK_API_SECRET}`).toString('base64')}`,
-      },
-      body: JSON.stringify({
-        query: location,
-        language: 'ru',
-      }),
-    });
+    const locationData = await locationResponse.json();
+    console.log('Location verification response:', locationData);
 
-    if (!regionSearchResponse.ok) {
+    if (!locationData.results?.locations?.length) {
+      console.error('Location not found:', locationId);
       return NextResponse.json(
-        { error: 'Failed to search region' },
-        { status: regionSearchResponse.status }
-      );
-    }
-
-    const regionData = await regionSearchResponse.json();
-    
-    if (!regionData.regions?.length) {
-      return NextResponse.json(
-        { error: 'Region not found' },
+        { error: 'Location not found' },
         { status: 404 }
       );
     }
 
-    const regionId = regionData.regions[0].id;
-
-    // Search for hotels in the region
-    const searchResponse = await fetch(`${OSTROVOK_API_URL}/hotels/search`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${Buffer.from(`${OSTROVOK_API_KEY}:${OSTROVOK_API_SECRET}`).toString('base64')}`,
-      },
-      body: JSON.stringify({
-        region_id: regionId,
-        checkin: checkIn,
-        checkout: checkOut,
-        guests: [{
-          adults: parseInt(guests, 10),
-          children: []
-        }],
-        currency: 'RUB',
-        language: 'ru',
-      }),
+    // Now search for hotels
+    const hotelSearchParams = new URLSearchParams({
+      location: locationId!,
+      checkIn: searchParams.get('checkIn')!,
+      checkOut: searchParams.get('checkOut')!,
+      adults: searchParams.get('adults')!,
+      children: searchParams.get('children') || '',
+      currency: searchParams.get('currency') || 'RUB',
+      lang: searchParams.get('lang') || 'ru',
+      limit: searchParams.get('limit') || '20',
+      sortBy: searchParams.get('sortBy') || 'popularity',
+      sortOrder: searchParams.get('sortOrder') || 'desc',
+      token: TRAVELPAYOUTS_TOKEN
     });
 
-    if (!searchResponse.ok) {
-      const errorData = await searchResponse.json().catch(() => null);
+    const apiUrl = `${HOTELLOOK_API_URL}/search.json?${hotelSearchParams.toString()}`;
+    console.log('Making request to Hotellook API:', {
+      url: apiUrl,
+      params: Object.fromEntries(hotelSearchParams.entries())
+    });
+
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Log the response status and headers
+    console.log('Hotellook API response:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error('Hotellook API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
       return NextResponse.json(
-        {
-          error: `Ostrovok API error (${searchResponse.status})`,
-          details: errorData?.message || searchResponse.statusText
+        { 
+          error: `Hotellook API error (${response.status})`,
+          details: errorData?.message || response.statusText 
         },
-        { status: searchResponse.status }
+        { status: response.status }
       );
     }
 
-    const data = await searchResponse.json();
+    const data = await response.json();
+    console.log('Hotellook API response data:', data);
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error proxying to Ostrovok API:', error);
+    console.error('Error proxying to Hotellook API:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch data from Ostrovok API' },
+      { error: 'Failed to fetch data from Hotellook API' },
       { status: 500 }
     );
   }

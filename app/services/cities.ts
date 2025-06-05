@@ -143,11 +143,11 @@ export async function getCityInfo(cityName: string): Promise<CityDocument> {
         { fullName: cityName }
       ]
     });
-    console.log('City found in database:', city ? 'yes' : 'no');
+    // console.log('City found in database:', city ? 'yes' : 'no');
 
     // Если город найден — просто возвращаем его, ничего не обновляем
     if (city) {
-      console.log('Returning existing city:', city);
+      // console.log('Returning existing city:', city);
       return city;
     }
 
