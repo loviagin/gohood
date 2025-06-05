@@ -532,31 +532,48 @@ export default function Hero() {
       return;
     }
 
-    if (!searchParams.checkOut) {
-      setError("Пожалуйста, выберите дату выезда");
-      return;
-    }
+    if (activeTab === "housing") {
+      if (!searchParams.checkOut) {
+        setError("Пожалуйста, выберите дату выезда");
+        return;
+      }
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      // Формируем URL с параметрами поиска
-      const queryParams = new URLSearchParams({
-        location: searchParams.location,
-        checkIn: format(searchParams.checkIn, 'yyyy-MM-dd'),
-        checkOut: format(searchParams.checkOut, 'yyyy-MM-dd'),
-        guests: searchParams.guests.toString(),
-      });
+      try {
+        // Формируем URL с параметрами поиска
+        const queryParams = new URLSearchParams({
+          location: searchParams.location,
+          checkIn: format(searchParams.checkIn, 'yyyy-MM-dd'),
+          checkOut: format(searchParams.checkOut, 'yyyy-MM-dd'),
+          guests: searchParams.guests.toString(),
+        });
 
-      // Перенаправляем на страницу поиска
-      console.log(`/search?${queryParams.toString()}`);
-      router.push(`/search?${queryParams.toString()}`);
-    } catch (err) {
-      console.error('Search error:', err);
-      setError("Произошла ошибка при поиске. Пожалуйста, попробуйте снова.");
-    } finally {
-      setIsLoading(false);
+        // Перенаправляем на страницу поиска
+        console.log(`/search?${queryParams.toString()}`);
+        router.push(`/search?${queryParams.toString()}`);
+      } catch (err) {
+        console.error('Search error:', err);
+        setError("Произошла ошибка при поиске. Пожалуйста, попробуйте снова.");
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // Для вкладки "Исследовать районы"
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Перенаправляем на страницу города
+        const cityName = searchParams.location.split(',')[0].trim().toLowerCase();
+        router.push(`/cities/${cityName}`);
+      } catch (err) {
+        console.error('Search error:', err);
+        setError("Произошла ошибка при поиске. Пожалуйста, попробуйте снова.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -799,7 +816,7 @@ export default function Hero() {
                 ) : (
                   <span className={styles.searchButtonContent}>
                     <Search className={styles.searchButtonIcon} aria-hidden="true" />
-                    Найти отель
+                    {activeTab === "housing" ? "Найти отель" : "Исследовать район"}
                   </span>
                 )}
               </button>
