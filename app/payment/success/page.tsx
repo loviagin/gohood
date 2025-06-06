@@ -27,12 +27,24 @@ function PaymentSuccessContent() {
 
         const checkPaymentStatus = async () => {
             try {
+                // Log all URL parameters for debugging
+                console.log('All URL parameters:', {
+                    payment_id: searchParams.get('payment_id'),
+                    paymentId: searchParams.get('paymentId'),
+                    id: searchParams.get('id'),
+                    orderId: searchParams.get('orderId'),
+                    order_id: searchParams.get('order_id'),
+                    raw: Object.fromEntries(searchParams.entries())
+                });
+
                 // Try to get payment ID from different possible URL parameters
                 const paymentId = searchParams.get('payment_id') || 
                                 searchParams.get('paymentId') || 
-                                searchParams.get('id');
+                                searchParams.get('id') ||
+                                searchParams.get('orderId') ||
+                                searchParams.get('order_id');
                 
-                console.log('Payment ID from URL:', paymentId);
+                console.log('Extracted payment ID:', paymentId);
                 
                 if (!paymentId) {
                     console.error('No payment ID in URL');

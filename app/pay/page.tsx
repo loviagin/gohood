@@ -100,7 +100,7 @@ function PaymentForm({ product }: PaymentFormProps) {
                                 />
                                 <label htmlFor="yoomoney">
                                     <Image 
-                                        src="/yoomoney-logo.png" 
+                                        src="/images/yookassa.webp" 
                                         alt="ЮMoney" 
                                         width={24} 
                                         height={24}
@@ -119,7 +119,7 @@ function PaymentForm({ product }: PaymentFormProps) {
                                 />
                                 <label htmlFor="card-ru">
                                     <Image 
-                                        src="/card-logo.png" 
+                                        src="/images/card.webp" 
                                         alt="Банковская карта" 
                                         width={24} 
                                         height={24}
@@ -131,7 +131,7 @@ function PaymentForm({ product }: PaymentFormProps) {
                     </div>
 
                     <div className={styles.paymentSection}>
-                        <h2 className={styles.sectionTitle}>Для других стран</h2>
+                        <h2 className={styles.sectionTitle}>Для не РФ</h2>
                         <div className={styles.paymentMethods}>
                             <div className={styles.paymentMethod}>
                                 <input
@@ -144,7 +144,7 @@ function PaymentForm({ product }: PaymentFormProps) {
                                 />
                                 <label htmlFor="paypal">
                                     <Image 
-                                        src="/paypal-logo.png" 
+                                        src="/images/paypal.webp" 
                                         alt="PayPal" 
                                         width={24} 
                                         height={24}
@@ -163,7 +163,7 @@ function PaymentForm({ product }: PaymentFormProps) {
                                 />
                                 <label htmlFor="card-stripe">
                                     <Image 
-                                        src="/stripe-logo.png" 
+                                        src="/images/stripe.webp" 
                                         alt="Stripe" 
                                         width={24} 
                                         height={24}
