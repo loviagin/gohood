@@ -43,7 +43,8 @@ function PaymentForm({ product }: PaymentFormProps) {
 
             const data = await response.json();
             
-            if (data.confirmation?.confirmation_url) {
+            if (data.confirmation?.confirmation_url && data.id) {
+                localStorage.setItem('lastPaymentId', data.id);
                 window.location.href = data.confirmation.confirmation_url;
             } else {
                 throw new Error('No confirmation URL received');
