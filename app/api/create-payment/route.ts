@@ -1,3 +1,4 @@
+//api/create-payment
 import { NextResponse } from 'next/server';
 
 const YOOKASSA_SHOP_ID = process.env.YOOKASSA_SHOP_ID;
@@ -25,10 +26,7 @@ export async function POST(request: Request) {
                 type: 'redirect',
                 return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`
             },
-            description: description,
-            metadata: {
-                orderId: idempotenceKey // Сохраняем idempotenceKey как orderId для последующей проверки
-            }
+            description: description
         };
 
         console.log('Sending payment data to YooKassa:', paymentData);
@@ -54,12 +52,12 @@ export async function POST(request: Request) {
         const data = await response.json();
         console.log('YooKassa payment response:', data);
         
-        if (data.confirmation?.confirmation_url) {
-            console.log('Using YooKassa confirmation URL:', data.confirmation.confirmation_url);
-            return NextResponse.json(data);
-        } else {
-            throw new Error('No confirmation URL in response');
+        // Update the confirmation URL with the actual payment ID
+        if (data.id && data.confirmation?.confirmation_url) {
+            data.confirmation.confirmation_url += `&payment_id=${data.id}`;
         }
+
+        return NextResponse.json(data);
     } catch (error) {
         console.error('Payment creation error:', error);
         return NextResponse.json(
