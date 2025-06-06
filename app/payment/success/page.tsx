@@ -42,13 +42,23 @@ function PaymentSuccessContent() {
                 }
 
                 console.log('Making request to check payment status...');
-                const response = await fetch(`/api/check-payment?payment_id=${paymentId}`);
+                const response = await fetch(`/api/check-payment?payment_id=${encodeURIComponent(paymentId)}`);
                 console.log('Response status:', response.status);
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('API error response:', errorText);
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                    let errorMessage = 'Произошла ошибка при проверке платежа';
+                    try {
+                        const errorData = await response.json();
+                        console.error('API error response:', errorData);
+                        if (errorData.details) {
+                            errorMessage = errorData.details;
+                        } else if (errorData.error) {
+                            errorMessage = errorData.error;
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse error response:', e);
+                    }
+                    throw new Error(errorMessage);
                 }
                 
                 const data = await response.json() as PaymentResponse;
@@ -56,7 +66,7 @@ function PaymentSuccessContent() {
 
                 if (!data.status) {
                     console.error('No status in response:', data);
-                    throw new Error('Invalid response format: no status field');
+                    throw new Error('Неверный формат ответа от платежной системы');
                 }
 
                 switch (data.status) {

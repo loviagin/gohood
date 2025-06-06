@@ -28,7 +28,7 @@ export async function POST(request: Request) {
                 capture: true,
                 confirmation: {
                     type: 'redirect',
-                    return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success?payment_id=${idempotenceKey}`
+                    return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`
                 },
                 description: description
             })
@@ -39,6 +39,14 @@ export async function POST(request: Request) {
         }
 
         const data = await response.json();
+        
+        // Update the confirmation URL with the actual payment ID
+        if (data.id && data.confirmation?.confirmation_url) {
+            const confirmationUrl = new URL(data.confirmation.confirmation_url);
+            confirmationUrl.searchParams.set('payment_id', data.id);
+            data.confirmation.confirmation_url = confirmationUrl.toString();
+        }
+
         return NextResponse.json(data);
     } catch (error) {
         console.error('Payment creation error:', error);
