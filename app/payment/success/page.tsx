@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 
@@ -13,7 +13,7 @@ interface PaymentResponse {
     description?: string;
 }
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
     const searchParams = useSearchParams();
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
     const [message, setMessage] = useState('Проверяем статус платежа...');
@@ -96,5 +96,21 @@ export default function PaymentSuccessPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function PaymentSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className={styles.container}>
+                <div className={styles.card}>
+                    <div className={`${styles.statusIcon} ${styles.loading}`}>⌛</div>
+                    <h1 className={styles.title}>Загрузка...</h1>
+                    <p className={styles.message}>Проверяем статус платежа...</p>
+                </div>
+            </div>
+        }>
+            <PaymentSuccessContent />
+        </Suspense>
     );
 } 
