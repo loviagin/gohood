@@ -1,149 +1,135 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import styles from './page.module.css';
 
 interface PaymentResponse {
     id: string;
-    status: 'succeeded' | 'pending' | 'waiting_for_capture' | 'canceled' | 'failed';
+    status: string;
     amount: {
         value: string;
         currency: string;
     };
-    description?: string;
-    confirmation?: {
-        confirmation_url: string;
-    };
+    description: string;
 }
 
 function PaymentSuccessContent() {
     const searchParams = useSearchParams();
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState('Проверяем статус платежа...');
+    const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'pending'>('loading');
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
-
         const checkPaymentStatus = async () => {
             try {
                 // Log all URL parameters for debugging
-                console.log('All URL parameters:', {
-                    orderId: searchParams.get('orderId'),
-                    order_id: searchParams.get('order_id'),
-                    payment_id: searchParams.get('payment_id'),
-                    paymentId: searchParams.get('paymentId'),
-                    id: searchParams.get('id'),
-                    raw: Object.fromEntries(searchParams.entries())
+                const allParams: Record<string, string | null> = {};
+                searchParams.forEach((value, key) => {
+                    allParams[key] = value;
                 });
+                console.log('All URL parameters:', allParams);
 
-                // Try to get payment ID from different possible URL parameters
-                const paymentId = searchParams.get('orderId') || 
-                                searchParams.get('order_id') || 
-                                searchParams.get('payment_id') || 
+                // Get payment ID from various possible parameters
+                const paymentId = searchParams.get('payment_id') || 
                                 searchParams.get('paymentId') || 
+                                searchParams.get('orderId') || 
+                                searchParams.get('order_id') || 
                                 searchParams.get('id');
-                
+
                 console.log('Extracted payment ID:', paymentId);
-                
+
                 if (!paymentId) {
-                    console.error('No payment ID in URL');
-                    setStatus('error');
-                    setMessage('Не удалось определить платеж. Пожалуйста, свяжитесь с поддержкой.');
-                    return;
+                    throw new Error('No payment ID found in URL');
                 }
 
                 console.log('Making request to check payment status...');
-                const response = await fetch(`/api/check-payment?payment_id=${encodeURIComponent(paymentId)}`);
+                const response = await fetch(`/api/check-payment?paymentId=${paymentId}`);
                 console.log('Response status:', response.status);
-                
-                if (!response.ok) {
-                    let errorMessage = 'Произошла ошибка при проверке платежа';
-                    try {
-                        const errorData = await response.json();
-                        console.error('API error response:', errorData);
-                        if (errorData.details) {
-                            errorMessage = errorData.details;
-                        } else if (errorData.error) {
-                            errorMessage = errorData.error;
-                        }
-                    } catch (e) {
-                        console.error('Failed to parse error response:', e);
-                    }
-                    throw new Error(errorMessage);
-                }
-                
-                const data = await response.json() as PaymentResponse;
-                console.log('Payment check response:', data);
 
-                if (!data.status) {
-                    console.error('No status in response:', data);
-                    throw new Error('Неверный формат ответа от платежной системы');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to check payment status');
                 }
+
+                const data: PaymentResponse = await response.json();
+                console.log('Payment check response:', data);
 
                 switch (data.status) {
                     case 'succeeded':
-                    case 'waiting_for_capture':
-                        console.log('Payment successful');
                         setStatus('success');
-                        setMessage('Оплата прошла успешно! Спасибо за покупку.');
                         break;
                     case 'pending':
-                        console.log('Payment pending, will check again');
-                        setStatus('loading');
-                        setMessage('Платеж обрабатывается...');
-                        timeoutId = setTimeout(checkPaymentStatus, 3000);
+                        setStatus('pending');
+                        // Retry after 3 seconds
+                        setTimeout(checkPaymentStatus, 3000);
+                        break;
+                    case 'waiting_for_capture':
+                        setStatus('success');
                         break;
                     case 'canceled':
-                        console.log('Payment canceled');
                         setStatus('error');
-                        setMessage('Платеж был отменен. Пожалуйста, попробуйте еще раз.');
+                        setError('Платеж был отменен');
                         break;
                     case 'failed':
-                        console.log('Payment failed');
                         setStatus('error');
-                        setMessage('Платеж не прошел. Пожалуйста, попробуйте еще раз.');
+                        setError('Платеж не удался');
                         break;
                     default:
-                        console.error('Unknown payment status:', data.status);
                         setStatus('error');
-                        setMessage('Неизвестный статус платежа. Пожалуйста, свяжитесь с поддержкой.');
+                        setError('Неизвестный статус платежа');
                 }
             } catch (error) {
                 console.error('Payment check error:', error);
                 setStatus('error');
-                setMessage(error instanceof Error ? error.message : 'Произошла ошибка при проверке платежа');
+                setError(error instanceof Error ? error.message : 'Произошла ошибка при проверке платежа');
             }
         };
 
         checkPaymentStatus();
-
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
     }, [searchParams]);
+
+    if (status === 'loading') {
+        return (
+            <div className={styles.container}>
+                <div className={styles.loading}>
+                    <div className={styles.spinner}></div>
+                    <p>Проверка статуса платежа...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (status === 'error') {
+        return (
+            <div className={styles.container}>
+                <div className={styles.error}>
+                    <h1>Ошибка оплаты</h1>
+                    <p>{error || 'Произошла ошибка при обработке платежа'}</p>
+                    <a href="/pay" className={styles.button}>Вернуться к оплате</a>
+                </div>
+            </div>
+        );
+    }
+
+    if (status === 'pending') {
+        return (
+            <div className={styles.container}>
+                <div className={styles.pending}>
+                    <h1>Платеж обрабатывается</h1>
+                    <p>Пожалуйста, подождите, мы проверяем статус вашего платежа...</p>
+                    <div className={styles.spinner}></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>
-            <div className={styles.card}>
-                <div className={`${styles.statusIcon} ${styles[status]}`}>
-                    {status === 'loading' && '⌛'}
-                    {status === 'success' && '✓'}
-                    {status === 'error' && '✕'}
-                </div>
-                <h1 className={styles.title}>
-                    {status === 'loading' && 'Проверка платежа'}
-                    {status === 'success' && 'Оплата успешна'}
-                    {status === 'error' && 'Ошибка оплаты'}
-                </h1>
-                <p className={styles.message}>{message}</p>
-                {status !== 'loading' && (
-                    <a href="/pay" className={styles.button}>
-                        Вернуться на страницу оплаты
-                    </a>
-                )}
+            <div className={styles.success}>
+                <h1>Оплата успешно завершена!</h1>
+                <p>Спасибо за ваш заказ. Мы обработаем его в ближайшее время.</p>
+                <a href="/" className={styles.button}>Вернуться на главную</a>
             </div>
         </div>
     );
@@ -153,12 +139,9 @@ export default function PaymentSuccessPage() {
     return (
         <Suspense fallback={
             <div className={styles.container}>
-                <div className={styles.card}>
-                    <div className={styles.statusIcon}>
-                        ⌛
-                    </div>
-                    <h1 className={styles.title}>Загрузка...</h1>
-                    <p className={styles.message}>Пожалуйста, подождите</p>
+                <div className={styles.loading}>
+                    <div className={styles.spinner}></div>
+                    <p>Загрузка...</p>
                 </div>
             </div>
         }>

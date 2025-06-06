@@ -51,19 +51,13 @@ export async function POST(request: Request) {
         const data = await response.json();
         console.log('YooKassa payment response:', data);
         
-        // Update the confirmation URL with the actual payment ID
-        if (data.id && data.confirmation?.confirmation_url) {
-            const confirmationUrl = new URL(data.confirmation.confirmation_url);
-            // Extract orderId from the confirmation URL
-            const orderId = confirmationUrl.searchParams.get('orderId');
-            if (orderId) {
-                // Update our return URL to include the orderId
-                data.confirmation.confirmation_url = `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success?orderId=${orderId}`;
-                console.log('Updated confirmation URL:', data.confirmation.confirmation_url);
-            }
+        // Return the original confirmation URL from YooKassa
+        if (data.confirmation?.confirmation_url) {
+            console.log('Using YooKassa confirmation URL:', data.confirmation.confirmation_url);
+            return NextResponse.json(data);
+        } else {
+            throw new Error('No confirmation URL in response');
         }
-
-        return NextResponse.json(data);
     } catch (error) {
         console.error('Payment creation error:', error);
         return NextResponse.json(
