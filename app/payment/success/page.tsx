@@ -89,7 +89,7 @@ function PaymentSuccessContent() {
             <div className={styles.container}>
                 <div className={styles.loading}>
                     <div className={styles.spinner}></div>
-                    <p>Проверка статуса платежа...</p>
+                    <p className={styles.message}>Проверка статуса платежа...</p>
                 </div>
             </div>
         );
@@ -100,7 +100,7 @@ function PaymentSuccessContent() {
             <div className={styles.container}>
                 <div className={styles.error}>
                     <h1>Ошибка оплаты</h1>
-                    <p>{error || 'Произошла ошибка при обработке платежа'}</p>
+                    <p className={styles.message}>{error || 'Произошла ошибка при обработке платежа'}</p>
                     <a href="/pay" className={styles.button}>Вернуться к оплате</a>
                 </div>
             </div>
@@ -112,7 +112,7 @@ function PaymentSuccessContent() {
             <div className={styles.container}>
                 <div className={styles.pending}>
                     <h1>Платеж обрабатывается</h1>
-                    <p>Пожалуйста, подождите, мы проверяем статус вашего платежа...</p>
+                    <p className={styles.message}>Пожалуйста, подождите, мы проверяем статус вашего платежа...</p>
                     <div className={styles.spinner}></div>
                 </div>
             </div>
@@ -123,7 +123,7 @@ function PaymentSuccessContent() {
         <div className={styles.container}>
             <div className={styles.success}>
                 <h1>Оплата успешно завершена!</h1>
-                <p>Спасибо за ваш заказ. Мы обработаем его в ближайшее время.</p>
+                <p className={styles.message}>Спасибо за ваш заказ. Мы обработаем его в ближайшее время.</p>
                 <a href="/" className={styles.button}>Вернуться на главную</a>
             </div>
         </div>
@@ -136,7 +136,7 @@ export default function PaymentSuccessPage() {
             <div className={styles.container}>
                 <div className={styles.loading}>
                     <div className={styles.spinner}></div>
-                    <p>Загрузка...</p>
+                    <p className={styles.message}>Загрузка...</p>
                 </div>
             </div>
         }>
