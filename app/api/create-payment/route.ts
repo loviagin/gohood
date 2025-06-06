@@ -26,7 +26,11 @@ export async function POST(request: Request) {
                 type: 'redirect',
                 return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`
             },
-            description: description
+            description: description,
+            metadata: {
+                product: description,
+                createdAt: new Date().toISOString()
+            }
         };
 
         console.log('Sending payment data to YooKassa:', paymentData);
