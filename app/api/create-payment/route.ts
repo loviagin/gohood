@@ -13,7 +13,7 @@ export async function POST(request: Request) {
         }
 
         const idempotenceKey = crypto.randomUUID();
-        console.log('Generated idempotence key:', idempotenceKey);
+        console.log('Generated idempotenceKey:', idempotenceKey);
 
         const paymentData = {
             amount: {
@@ -54,9 +54,13 @@ export async function POST(request: Request) {
         // Update the confirmation URL with the actual payment ID
         if (data.id && data.confirmation?.confirmation_url) {
             const confirmationUrl = new URL(data.confirmation.confirmation_url);
-            confirmationUrl.searchParams.set('payment_id', data.id);
-            data.confirmation.confirmation_url = confirmationUrl.toString();
-            console.log('Updated confirmation URL:', data.confirmation.confirmation_url);
+            // Extract orderId from the confirmation URL
+            const orderId = confirmationUrl.searchParams.get('orderId');
+            if (orderId) {
+                // Update our return URL to include the orderId
+                data.confirmation.confirmation_url = `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success?orderId=${orderId}`;
+                console.log('Updated confirmation URL:', data.confirmation.confirmation_url);
+            }
         }
 
         return NextResponse.json(data);
