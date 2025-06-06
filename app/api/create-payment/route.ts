@@ -54,7 +54,17 @@ export async function POST(request: Request) {
         
         // Update the confirmation URL with the actual payment ID
         if (data.id && data.confirmation?.confirmation_url) {
-            data.confirmation.confirmation_url += `&payment_id=${data.id}`;
+            // Подменяем return_url прямо в confirmation_url
+            const confirmationUrl = new URL(data.confirmation.confirmation_url);
+        
+            confirmationUrl.searchParams.set(
+                'return_url',
+                `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success?payment_id=${data.id}`
+            );
+        
+            data.confirmation.confirmation_url = confirmationUrl.toString();
+        
+            console.log('Updated confirmation URL with payment_id:', data.confirmation.confirmation_url);
         }
 
         return NextResponse.json(data);
