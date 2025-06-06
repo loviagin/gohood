@@ -25,7 +25,10 @@ export async function POST(request: Request) {
                 type: 'redirect',
                 return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`
             },
-            description: description
+            description: description,
+            metadata: {
+                orderId: idempotenceKey // Сохраняем idempotenceKey как orderId для последующей проверки
+            }
         };
 
         console.log('Sending payment data to YooKassa:', paymentData);
@@ -51,7 +54,6 @@ export async function POST(request: Request) {
         const data = await response.json();
         console.log('YooKassa payment response:', data);
         
-        // Return the original confirmation URL from YooKassa
         if (data.confirmation?.confirmation_url) {
             console.log('Using YooKassa confirmation URL:', data.confirmation.confirmation_url);
             return NextResponse.json(data);
