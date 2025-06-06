@@ -28,7 +28,7 @@ export async function POST(request: Request) {
                 capture: true,
                 confirmation: {
                     type: 'redirect',
-                    return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`
+                    return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success?payment_id=${idempotenceKey}`
                 },
                 description: description
             })

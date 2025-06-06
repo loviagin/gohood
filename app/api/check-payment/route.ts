@@ -44,18 +44,31 @@ export async function GET(request: Request) {
         console.log('YooKassa API response status:', response.status);
 
         if (!response.ok) {
-            const errorData = await response.json() as YooKassaError;
-            console.error('YooKassa API error:', {
-                status: response.status,
-                statusText: response.statusText,
-                error: errorData
-            });
-            throw new Error(`YooKassa API error: ${errorData.description || response.statusText}`);
+            let errorMessage = 'Unknown error';
+            try {
+                const errorData = await response.json() as YooKassaError;
+                console.error('YooKassa API error:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: errorData
+                });
+                errorMessage = errorData.description || response.statusText;
+            } catch (e) {
+                const errorText = await response.text();
+                console.error('Failed to parse YooKassa error:', errorText);
+                errorMessage = errorText || response.statusText;
+            }
+            throw new Error(`YooKassa API error: ${errorMessage}`);
         }
 
         const data = await response.json();
         console.log('Payment status:', data.status);
         
+        if (!data.status) {
+            console.error('Invalid response from YooKassa:', data);
+            throw new Error('Invalid response from YooKassa: no status field');
+        }
+
         return NextResponse.json(data);
     } catch (error: unknown) {
         console.error('Payment check error:', error);
