@@ -207,6 +207,17 @@
     gap: 1rem;
   }
 
+  .titleContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .readMoreButton {
+    width: 100%;
+    justify-content: center;
+  }
+
   .details {
     flex-direction: column;
     align-items: stretch;

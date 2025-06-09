@@ -1,0 +1,536 @@
+.searchForm {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.searchInputsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1fr auto;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .searchInputsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .searchButton {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .searchForm {
+    padding: 1rem;
+  }
+
+  .searchInputsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+.searchInputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  height: 3rem;
+  padding: 0 1rem 0 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  color: #0f172a;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.searchInput:hover {
+  border-color: #cbd5e1;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.searchInputError {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.searchInputIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.searchError {
+  position: absolute;
+  bottom: -1.5rem;
+  left: 0;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.suggestionsLoading {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.suggestionsSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.suggestionsDropdown {
+  position: absolute;
+  z-index: 9999;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  margin-top: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  min-width: 320px;
+  width: max-content;
+  max-width: 480px;
+}
+
+.suggestionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  gap: 1.5rem;
+}
+
+.suggestionItem:hover,
+.suggestionItem:focus {
+  background-color: #f8fafc;
+  outline: none;
+}
+
+.suggestionMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.suggestionCity {
+  font-weight: 500;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9375rem;
+}
+
+.suggestionCountry {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.suggestionHotels {
+  font-size: 0.875rem;
+  color: #2563eb;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-left: 1rem;
+  border-left: 1px solid #e2e8f0;
+  min-width: 90px;
+  text-align: right;
+}
+
+.datePickerWrapper,
+.guestPickerWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.datePickerButton,
+.guestPickerButton {
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  color: #0f172a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.datePickerButton:hover,
+.guestPickerButton:hover {
+  border-color: #cbd5e1;
+}
+
+.datePickerButton:focus,
+.guestPickerButton:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.datePickerIcon,
+.guestPickerIcon {
+  width: 18px;
+  height: 18px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.datePickerText,
+.guestPickerText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  text-align: left;
+}
+
+.datePickerLabel,
+.guestPickerLabel {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.datePickerValue,
+.guestPickerValue {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.datePickerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+}
+
+.datePickerDropdown {
+  position: absolute;
+  z-index: 50;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem;
+}
+
+.guestPickerDropdown {
+  position: absolute;
+  z-index: 50;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem;
+  min-width: 280px;
+}
+
+.calendar {
+  min-width: 320px;
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.calendarNavButton {
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: color 0.2s;
+  border-radius: 0.5rem;
+}
+
+.calendarNavButton:hover:not(:disabled) {
+  color: #2563eb;
+  background-color: #f1f5f9;
+}
+
+.calendarNavButton:disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.calendarMonth {
+  font-weight: 500;
+  color: #1e293b;
+  text-transform: capitalize;
+  font-size: 1.125rem;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.375rem;
+}
+
+.calendarWeekday {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #64748b;
+  padding: 0.5rem 0;
+  font-weight: 500;
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  color: #1e293b;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.calendarDay:hover:not(:disabled) {
+  background-color: #f1f5f9;
+}
+
+.calendarDaySelected {
+  background-color: #2563eb;
+  color: white;
+}
+
+.calendarDaySelected:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.calendarDayRange {
+  background-color: #dbeafe;
+  border-radius: 0;
+}
+
+.calendarDayRange:hover:not(:disabled) {
+  background-color: #bfdbfe;
+}
+
+.calendarDayOtherMonth {
+  color: #cbd5e1;
+}
+
+.calendarDayDisabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.guestPickerControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.guestPickerControl {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: white;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.guestPickerControl:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #2563eb;
+  background-color: #f1f5f9;
+}
+
+.guestPickerControl:disabled {
+  border-color: #e2e8f0;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.guestPickerCount {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #1e293b;
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+.searchButton {
+  height: 3rem;
+  padding: 0 1.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.searchButton:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.searchButton:active {
+  transform: translateY(0);
+}
+
+.searchButtonIcon {
+  width: 18px;
+  height: 18px;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .datePickerDropdown,
+  .guestPickerDropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 2rem);
+    max-width: 400px;
+    margin: 0;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .guestPickerDropdown {
+    max-width: 300px;
+  }
+
+  .calendar {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .searchInput,
+  .datePickerButton,
+  .guestPickerButton,
+  .searchButton {
+    height: 2.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .searchInputIcon,
+  .datePickerIcon,
+  .guestPickerIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .datePickerLabel,
+  .guestPickerLabel {
+    font-size: 0.6875rem;
+  }
+
+  .datePickerValue,
+  .guestPickerValue {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .searchForm {
+    padding: 0.75rem;
+  }
+
+  .searchInputsGrid {
+    gap: 0.625rem;
+  }
+
+  .searchInput,
+  .datePickerButton,
+  .guestPickerButton,
+  .searchButton {
+    height: 2.5rem;
+    font-size: 0.875rem;
+  }
+
+  .searchInputIcon,
+  .datePickerIcon,
+  .guestPickerIcon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .datePickerLabel,
+  .guestPickerLabel {
+    font-size: 0.625rem;
+  }
+
+  .datePickerValue,
+  .guestPickerValue {
+    font-size: 0.8125rem;
+  }
+} 
