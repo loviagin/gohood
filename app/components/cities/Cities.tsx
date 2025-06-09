@@ -21,14 +21,18 @@ export default function Cities() {
         <div className={styles.grid}>
           {cities.map((city) => (
             <div key={city.name} className={styles.card}>
-              <img
-                src={city.image}
-                alt={city.name}
-                className={styles.image}
-              />
-              <div className={styles.overlay}>
-                <h3 className={styles.name}>{city.name}</h3>
-              </div>
+              <Link href={`/cities/${city.name}`}>
+                <>
+                  <img
+                    src={city.image}
+                    alt={city.name}
+                    className={styles.image}
+                  />
+                  <div className={styles.overlay}>
+                    <h3 className={styles.name}>{city.name}</h3>
+                  </div>
+                </>
+              </Link>
             </div>
           ))}
         </div>
