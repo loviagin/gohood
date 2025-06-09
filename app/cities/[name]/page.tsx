@@ -202,15 +202,15 @@ export default function CityPage({ params }: CityPageProps) {
   };
 
   if (loading) {
-    return <div className={styles.loading}>Loading...</div>;
+    return <div className={styles.loading}>Загрузка...</div>;
   }
 
   if (error || !city) {
     return (
       <div className={styles.error}>
-        {error || 'City not found'}
+        {error || 'Город не найден'}
         <button onClick={fetchCityData} className={styles.retryButton}>
-          Retry
+          Повторить
         </button>
       </div>
     );
@@ -243,26 +243,26 @@ export default function CityPage({ params }: CityPageProps) {
 
       <section className={styles.quickInfo}>
         <div className={styles.infoCard}>
-          <h3>Population</h3>
+          <h3>Население</h3>
           <p>{city.details?.population?.toLocaleString()}</p>
         </div>
         <div className={styles.infoCard}>
-          <h3>Language</h3>
+          <h3>Язык</h3>
           <p>{city.details?.language}</p>
         </div>
         <div className={styles.infoCard}>
-          <h3>Currency</h3>
+          <h3>Валюта</h3>
           <p>{city.details?.currency}</p>
         </div>
         <div className={styles.infoCard}>
-          <h3>Best Time to Visit</h3>
+          <h3>Лучшее время посетить</h3>
           <p>{city.details?.bestTimeToVisit}</p>
         </div>
       </section>
 
       {city.transportation && (
         <section className={styles.transportation}>
-          <h2>Transportation</h2>
+          <h2>Транспорт</h2>
           <p className={styles.generalInfo}>{city.transportation.generalInfo}</p>
           <div className={styles.transportTypes}>
             {city.transportation.types.map((type, index) => (
@@ -270,7 +270,7 @@ export default function CityPage({ params }: CityPageProps) {
                 <h3>{type.name}</h3>
                 <p>{type.description}</p>
                 <div className={styles.paymentMethods}>
-                  <h4>Payment Methods:</h4>
+                  <h4>Методы оплаты:</h4>
                   <ul>
                     {type.paymentMethods.map((method, i) => (
                       <li key={i}>{method}</li>
@@ -278,7 +278,7 @@ export default function CityPage({ params }: CityPageProps) {
                   </ul>
                 </div>
                 <div className={styles.tips}>
-                  <h4>Tips:</h4>
+                  <h4>Советы:</h4>
                   <p>{type.tips}</p>
                 </div>
               </div>
@@ -289,13 +289,13 @@ export default function CityPage({ params }: CityPageProps) {
 
       {city.mobileOperators && (
         <section className={styles.mobileOperators}>
-          <h2>Mobile Operators</h2>
+          <h2>Мобильные операторы</h2>
           <div className={styles.operatorsGrid}>
             {city.mobileOperators.map((operator, index) => (
               <div key={index} className={styles.operatorCard}>
                 <h3>{operator.name}</h3>
                 {operator.hasESim && (
-                  <span className={styles.esimBadge}>eSIM Available</span>
+                  <span className={styles.esimBadge}>eSIM доступен</span>
                 )}
                 <p>{operator.description}</p>
                 <a
@@ -304,7 +304,7 @@ export default function CityPage({ params }: CityPageProps) {
                   rel="noopener noreferrer"
                   className={styles.operatorLink}
                 >
-                  Visit Website
+                  Посетить сайт
                 </a>
               </div>
             ))}

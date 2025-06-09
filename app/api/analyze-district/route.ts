@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
+import connectDB from '@/lib/db';
+import { City } from '@/models/City';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
 
@@ -14,6 +16,24 @@ export async function POST(request: Request) {
       );
     }
 
+    // Connect to database
+    await connectDB();
+
+    // Find the city
+    const cityDoc = await City.findOne({ name: city });
+    if (!cityDoc) {
+      return NextResponse.json(
+        { error: 'City not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if district already exists
+    const existingDistrict = cityDoc.districts.find((d: { name: string }) => d.name === address);
+    if (existingDistrict) {
+      return NextResponse.json(existingDistrict);
+    }
+
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const prompt = `
@@ -24,6 +44,8 @@ export async function POST(request: Request) {
       3. Транспортная доступность
       4. Безопасность
       5. Стоимость недвижимости
+
+      ОТВЕТ ДОЛЖЕН БЫТЬ НА РУССКОМ ЯЗЫКЕ
       
       Верни ответ в формате JSON:
       {
@@ -53,7 +75,40 @@ export async function POST(request: Request) {
 
     const analysis = JSON.parse(jsonMatch[0]);
 
-    return NextResponse.json(analysis);
+    // Add the new district to the city's districts array
+    const newDistrict = {
+      name: analysis.name,
+      rating: analysis.rating,
+      // Add default values for required fields
+      population: 0,
+      demographics: {
+        white: 0,
+        african: 0,
+        other: 0
+      },
+      safety: {
+        daytime: analysis.rating.score,
+        nighttime: analysis.rating.score
+      },
+      transport: {
+        score: analysis.rating.score,
+        description: analysis.rating.factors[2] // Transport description from factors
+      },
+      network: {
+        coverage: 0,
+        description: 'Нет данных'
+      },
+      tourism: {
+        popularity: 0,
+        description: 'Нет данных'
+      }
+    };
+
+    // Update the city document with the new district
+    cityDoc.districts.push(newDistrict);
+    await cityDoc.save();
+
+    return NextResponse.json(newDistrict);
   } catch (error) {
     console.error('Error analyzing district:', error);
     return NextResponse.json(

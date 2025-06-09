@@ -121,7 +121,7 @@ export async function getCityInfo(cityName: string): Promise<GeminiCityResponse>
     const [city, country] = cityName.split(',').map(s => s.trim());
     console.log('Gemini: Parsed city:', city, 'country:', country);
     
-    const prompt = `Generate detailed information about ${city}, ${country} in the following JSON format:
+    const prompt = `Сгенерируй подробную информацию о ${city}, ${country} в следующем формате JSON:
     {
       "name": "${city}",
       "fullName": "${city}, ${country}",
@@ -196,7 +196,9 @@ export async function getCityInfo(cityName: string): Promise<GeminiCityResponse>
           }
         }
       ]
-    }`;
+    }
+      ОТВЕТ ДОЛЖЕН БЫТЬ НА РУССКОМ ЯЗЫКЕ
+      `;
 
     console.log('Gemini: Sending prompt to model');
     const result = await getGeminiResponse(prompt);
