@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://gohood.ru'
+  const baseUrl = 'https://gohood.city'
   
   // Define static routes
   const routes = [
