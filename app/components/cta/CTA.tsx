@@ -10,11 +10,11 @@ export default function CTA() {
           Присоединяйтесь к сообществу GoHood и найдите идеальное жилье или арендатора
         </p>
         <div className={styles.buttons}>
-          <Link href="/become-landlord/register" className={styles.button}>
+          <Link href="/registration?role=landlord" className={styles.button}>
             <span className={styles.buttonText}>Я арендодатель</span>
             <span className={styles.buttonDescription}>Разместите свое жилье</span>
           </Link>
-          <Link href="/rent/register" className={`${styles.button} ${styles.buttonSecondary}`}>
+          <Link href="/registration?role=tenant" className={`${styles.button} ${styles.buttonSecondary}`}>
             <span className={styles.buttonText}>Я арендующий</span>
             <span className={styles.buttonDescription}>Найдите жилье</span>
           </Link>
